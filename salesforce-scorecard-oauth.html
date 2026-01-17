@@ -1,0 +1,1663 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rho Performance Scorecard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans-serif;
+            background: #F8F9FA;
+            padding: 20px;
+            min-height: 100vh;
+            color: #0A0A0A;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: #FFFFFF;
+            border: 1px solid #E5E7EB;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px -1px rgba(10, 10, 10, 0.08);
+        }
+
+        h1 {
+            color: #0A0A0A;
+            margin-bottom: 10px;
+            font-size: 28px;
+            font-weight: 600;
+        }
+
+        h2 {
+            color: #0A0A0A;
+            margin-bottom: 20px;
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        h3 {
+            font-weight: 600;
+            color: #0A0A0A;
+        }
+
+        .subtitle {
+            color: #777;
+            margin-bottom: 30px;
+        }
+
+        .auth-section {
+            display: grid;
+            gap: 15px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            color: #555;
+            font-weight: 600;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+
+        input {
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #00D4AA;
+        }
+
+        button {
+            background: #00D4AA;
+            color: white;
+            padding: 14px 28px;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, background 0.2s;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background: #00BF99;
+            transform: translateY(-2px);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .login-btn {
+            background: #00a1e0;
+            font-size: 18px;
+            padding: 16px 32px;
+        }
+
+        .logout-btn {
+            background: #0A0A0A;
+            padding: 10px 20px;
+            font-size: 14px;
+        }
+
+        .logout-btn:hover {
+            background: #2A2A2A;
+        }
+
+        .scorecard {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        .metric-card {
+            background: #FFFFFF;
+            border: 1px solid #E5E7EB;
+            border-radius: 8px;
+            padding: 24px;
+            transition: all 0.2s;
+            box-shadow: 0 1px 2px 0 rgba(10, 10, 10, 0.05);
+        }
+
+        .metric-card:hover {
+            border-color: #00D4AA;
+            box-shadow: 0 4px 6px -1px rgba(10, 10, 10, 0.08);
+            transform: translateY(-2px);
+        }
+
+        .metric-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .metric-name {
+            font-size: 18px;
+            font-weight: 700;
+            color: #333;
+        }
+
+        .metric-status {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-success {
+            background: #10b981;
+            color: white;
+        }
+
+        .status-warning {
+            background: #f59e0b;
+            color: white;
+        }
+
+        .status-danger {
+            background: #ef4444;
+            color: white;
+        }
+
+        .metric-values {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+
+        .value-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .value-label {
+            color: #666;
+            font-size: 12px;
+            margin-bottom: 3px;
+        }
+
+        .value-number {
+            font-size: 24px;
+            font-weight: 700;
+            color: #333;
+        }
+
+        .progress-bar-container {
+            background: #e0e0e0;
+            border-radius: 10px;
+            height: 20px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-bar {
+            height: 100%;
+            border-radius: 10px;
+            transition: width 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 10px;
+            color: white;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .progress-success {
+            background: linear-gradient(90deg, #00D4AA 0%, #00BF99 100%);
+        }
+
+        .progress-warning {
+            background: linear-gradient(90deg, #F59E0B 0%, #D97706 100%);
+        }
+
+        .progress-danger {
+            background: linear-gradient(90deg, #EF4444 0%, #DC2626 100%);
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #667eea;
+            font-size: 18px;
+        }
+
+        .error {
+            background: #fee2e2;
+            color: #991b1b;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            border-left: 4px solid #dc2626;
+        }
+
+        .success {
+            background: #d1fae5;
+            color: #065f46;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            border-left: 4px solid #10b981;
+        }
+
+        .info-box {
+            background: #dbeafe;
+            border-left: 4px solid #3b82f6;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            color: #1e40af;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .info-box strong {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 15px;
+        }
+
+        .info-box ol, .info-box ul {
+            margin-left: 20px;
+            margin-top: 10px;
+        }
+
+        .info-box li {
+            margin-bottom: 5px;
+        }
+
+        .info-box code {
+            background: #1e40af;
+            color: white;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 13px;
+        }
+
+        .refresh-btn {
+            background: #00D4AA;
+            margin-right: 10px;
+        }
+
+        .refresh-btn:hover {
+            background: #00BF99;
+        }
+
+        .config-btn {
+            background: #0A0A0A;
+        }
+
+        .config-btn:hover {
+            background: #2A2A2A;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .user-info {
+            background: #0A0A0A;
+            padding: 16px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .user-info-text {
+            color: #FFFFFF;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .user-info-text strong {
+            font-weight: 600;
+            margin-right: 8px;
+        }
+
+        .modal {
+            display: flex;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 30px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .modal-header h2 {
+            margin: 0;
+            font-size: 22px;
+        }
+
+        .close-btn {
+            font-size: 32px;
+            color: #999;
+            cursor: pointer;
+            line-height: 1;
+        }
+
+        .close-btn:hover {
+            color: #333;
+        }
+
+        .modal-body {
+            padding: 30px;
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            padding: 20px 30px;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .target-input-group {
+            margin-bottom: 20px;
+        }
+
+        .target-input-group label {
+            display: block;
+            color: #555;
+            font-weight: 600;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+
+        .target-input-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .target-input-group input:focus {
+            outline: none;
+            border-color: #00D4AA;
+        }
+
+        a {
+            color: #00D4AA;
+            text-decoration: none;
+        }
+
+        a:hover {
+            color: #00BF99;
+            text-decoration: underline;
+        }
+
+        input:focus, select:focus {
+            box-shadow: 0 0 0 3px rgba(0, 212, 170, 0.1);
+        }
+
+        .gauge-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 20px 0;
+            position: relative;
+        }
+
+        .gauge-svg {
+            max-width: 200px;
+            height: auto;
+        }
+
+        .gauge-value {
+            position: absolute;
+            font-size: 32px;
+            font-weight: 700;
+            color: #0A0A0A;
+        }
+
+        .gauge-label {
+            position: absolute;
+            bottom: 30px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        @media (max-width: 768px) {
+            .scorecard {
+                grid-template-columns: 1fr;
+            }
+
+            .metric-values {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .modal-content {
+                width: 95%;
+                max-height: 90vh;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <h1>Rho Performance Scorecard</h1>
+            <p class="subtitle">Track your metrics against targets in real-time</p>
+
+            <div id="setupSection" class="hidden">
+                <div class="info-box">
+                    <strong>First Time Setup - Create a Connected App in Salesforce:</strong>
+                    <ol>
+                        <li>Log into Salesforce → Setup → App Manager → New Connected App</li>
+                        <li>Fill in: Connected App Name, API Name, Contact Email</li>
+                        <li>Enable OAuth Settings ✓</li>
+                        <li>Set Callback URL to: <code id="callbackUrlDisplay"></code></li>
+                        <li>Selected OAuth Scopes: Add <code>Full access (full)</code> and <code>Perform requests at any time (refresh_token, offline_access)</code></li>
+                        <li>Click Save, then Continue</li>
+                        <li>Click "Manage Consumer Details" to get your Consumer Key</li>
+                        <li>Copy the Consumer Key and paste it below</li>
+                    </ol>
+                </div>
+
+                <div class="form-group">
+                    <label for="clientId">Consumer Key (Client ID)</label>
+                    <input type="text" id="clientId" placeholder="Paste your Connected App Consumer Key here">
+                </div>
+
+                <div class="form-group">
+                    <label for="instanceUrl">Salesforce Login URL</label>
+                    <input type="text" id="instanceUrl" placeholder="https://login.salesforce.com or https://test.salesforce.com" value="https://login.salesforce.com">
+                    <small style="color: #666; margin-top: 5px;">Use https://test.salesforce.com for sandbox</small>
+                </div>
+
+                <button onclick="saveConfig()">Save Configuration</button>
+            </div>
+
+            <div id="loginSection" class="hidden">
+                <div class="info-box">
+                    <strong>Ready to Connect!</strong>
+                    <p>Click the button below to log in with your Salesforce credentials. You'll be redirected to Salesforce to authorize this app.</p>
+                </div>
+                <button class="login-btn" onclick="loginWithSalesforce()">Login with Salesforce</button>
+                <br><br>
+                <button class="config-btn" onclick="showSetup()">Change Configuration</button>
+            </div>
+
+            <div id="userInfoSection" class="hidden">
+                <div class="user-info">
+                    <div class="user-info-text">
+                        <strong>Connected:</strong> <span id="userName"></span> <span style="color: #666; margin: 0 8px;">•</span> <span id="orgName"></span>
+                    </div>
+                    <button class="logout-btn" onclick="logout()">Logout</button>
+                </div>
+            </div>
+
+            <div id="errorMessage" class="error hidden"></div>
+            <div id="successMessage" class="success hidden"></div>
+        </div>
+
+        <div id="scorecardSection" class="hidden">
+            <div class="card">
+                <div style="margin-bottom: 20px;">
+                    <label for="ownerSelect" style="display: block; margin-bottom: 8px; color: #555; font-weight: 600;">Filter by Opportunity Owner:</label>
+                    <select id="ownerSelect" onchange="loadScorecard()" style="padding: 10px; border: 2px solid #e0e0e0; border-radius: 6px; font-size: 14px; width: 100%; max-width: 300px; cursor: pointer;">
+                        <option value="">Loading owners...</option>
+                    </select>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h2>Performance Metrics</h2>
+                    <div class="button-group">
+                        <button class="refresh-btn" onclick="loadScorecard()">Refresh</button>
+                        <button class="config-btn" onclick="showEditTargets()">Edit Targets</button>
+                    </div>
+                </div>
+                <div id="scorecard" class="scorecard"></div>
+            </div>
+        </div>
+
+        <div id="editTargetsSection" class="hidden">
+            <div class="card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h2>Edit Targets</h2>
+                    <button class="config-btn" onclick="showScorecard()">Back to Scorecard</button>
+                </div>
+                <div id="targetInputs" style="max-width: 500px;"></div>
+                <div style="margin-top: 30px;">
+                    <button class="refresh-btn" onclick="saveTargets()" style="padding: 14px 32px; font-size: 16px;">Save Targets</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="loading" class="loading hidden">
+            <div>Loading metrics...</div>
+        </div>
+    </div>
+
+    <script>
+        // ==========================================
+        // CONFIGURATION SECTION
+        // ==========================================
+
+        /**
+         * Metric Configurations
+         *
+         * This array contains both report-based and calculated metrics.
+         *
+         * REPORT-BASED METRICS:
+         * - Pull data directly from Salesforce reports
+         * - Required fields: type, metricId, reportId, metricName, target, unit, aggregationField, aggregationType
+         *
+         * CALCULATED METRICS:
+         * - Derive values from other metrics using formulas
+         * - Required fields: type, metricId, metricName, formula, target, unit
+         * - Formula operations: 'divide', 'multiply', 'add', 'subtract'
+         *
+         * Examples:
+         * - Win Rate = (Activations ÷ New Leads) × 100
+         * - Application Rate = (Applications ÷ New Leads) × 100
+         * - Activation Rate = (Activations ÷ Applications) × 100
+         */
+        const metricConfigs = [
+            // Report-based metrics
+            {
+                type: 'report',
+                metricId: 'newLeads',
+                reportId: '00OTP000008LLJO2A4',
+                metricName: 'New Leads Created Per Month',
+                target: 29,
+                unit: '',
+                aggregationField: 'ID',
+                aggregationType: 'count'
+            },
+            {
+                type: 'report',
+                metricId: 'applications',
+                reportId: '00OTP000008Vesb2AC',
+                metricName: 'Applications Submitted Per Month',
+                target: 17,
+                unit: '',
+                aggregationField: 'ID',
+                aggregationType: 'count'
+            },
+            {
+                type: 'report',
+                metricId: 'activations',
+                reportId: '00OTP000008Vfwk2AC',
+                metricName: 'Activations Per Month',
+                target: 13,
+                unit: '',
+                aggregationField: 'ID',
+                aggregationType: 'count'
+            },
+            // Calculated metrics
+            {
+                type: 'calculated',
+                metricId: 'winRate',
+                metricName: 'Win Rate',
+                formula: {
+                    operation: 'divide',
+                    numerator: 'activations',      // metricId of activations metric
+                    denominator: 'newLeads',        // metricId of new leads metric
+                    multiplyBy: 100                 // Convert to percentage
+                },
+                target: 100,
+                unit: '%'
+            }
+        ];
+
+        // Get metric configs with targets from localStorage or defaults
+        function getMetricConfigs() {
+            const savedTargets = localStorage.getItem('metric_targets');
+
+            if (savedTargets) {
+                try {
+                    const targets = JSON.parse(savedTargets);
+                    // Merge saved targets with default configs
+                    return metricConfigs.map(config => ({
+                        ...config,
+                        target: targets[config.metricId] !== undefined ? targets[config.metricId] : config.target
+                    }));
+                } catch (e) {
+                    console.error('Error loading saved targets:', e);
+                }
+            }
+
+            return metricConfigs;
+        }
+
+        // Save targets to localStorage
+        function saveTargetsToStorage(targets) {
+            localStorage.setItem('metric_targets', JSON.stringify(targets));
+        }
+
+        // ==========================================
+        // FORMULA ENGINE
+        // ==========================================
+
+        /**
+         * Validates metric configurations for errors
+         * Checks for missing metricId, duplicates, and invalid formulas
+         */
+        function validateConfigs(configs) {
+            const seenIds = new Set();
+            const errors = [];
+
+            configs.forEach((config, index) => {
+                // Check for missing metricId
+                if (!config.metricId) {
+                    errors.push(`Config at index ${index} missing metricId`);
+                } else if (seenIds.has(config.metricId)) {
+                    errors.push(`Duplicate metricId: ${config.metricId}`);
+                }
+                seenIds.add(config.metricId);
+
+                // Validate calculated metrics have formulas
+                if (config.type === 'calculated') {
+                    if (!config.formula || !config.formula.operation) {
+                        errors.push(`Calculated metric ${config.metricId} missing formula or operation`);
+                    }
+                }
+
+                // Validate report-based metrics have reportId
+                if (config.type === 'report') {
+                    if (!config.reportId) {
+                        errors.push(`Report metric ${config.metricId} missing reportId`);
+                    }
+                }
+            });
+
+            if (errors.length > 0) {
+                console.error('Configuration errors:', errors);
+                showError('Configuration errors detected. Check console for details.');
+                return false;
+            }
+
+            return true;
+        }
+
+        /**
+         * Executes a formula using the provided metric values
+         * @param {Object} formula - Formula object with operation type and operands
+         * @param {Object} metricValues - Map of metricId to actual values
+         * @returns {number} Calculated result
+         */
+        function executeFormula(formula, metricValues) {
+            const { operation } = formula;
+
+            switch (operation) {
+                case 'divide': {
+                    const num = metricValues[formula.numerator];
+                    const den = metricValues[formula.denominator];
+
+                    // Validation
+                    if (num === undefined) {
+                        throw new Error(`Missing metric: ${formula.numerator}`);
+                    }
+                    if (den === undefined) {
+                        throw new Error(`Missing metric: ${formula.denominator}`);
+                    }
+                    if (typeof num === 'object' && num.error) {
+                        throw new Error(`Dependency error in ${formula.numerator}: ${num.error}`);
+                    }
+                    if (typeof den === 'object' && den.error) {
+                        throw new Error(`Dependency error in ${formula.denominator}: ${den.error}`);
+                    }
+
+                    // Division by zero handling
+                    if (den === 0) {
+                        console.log(`Division by zero in formula: ${formula.numerator} / ${formula.denominator}, returning 0`);
+                        return 0;
+                    }
+
+                    let result = num / den;
+                    if (formula.multiplyBy) {
+                        result *= formula.multiplyBy;
+                    }
+
+                    console.log(`Formula result: ${num} / ${den}${formula.multiplyBy ? ' * ' + formula.multiplyBy : ''} = ${result}`);
+                    return result;
+                }
+
+                case 'multiply': {
+                    const factor1 = metricValues[formula.factor1];
+                    const factor2 = metricValues[formula.factor2];
+
+                    if (factor1 === undefined) throw new Error(`Missing metric: ${formula.factor1}`);
+                    if (factor2 === undefined) throw new Error(`Missing metric: ${formula.factor2}`);
+
+                    return factor1 * factor2;
+                }
+
+                case 'add': {
+                    if (!formula.operands || !Array.isArray(formula.operands)) {
+                        throw new Error('Add operation requires operands array');
+                    }
+
+                    let sum = 0;
+                    for (const operandId of formula.operands) {
+                        const value = metricValues[operandId];
+                        if (value === undefined) throw new Error(`Missing metric: ${operandId}`);
+                        sum += value;
+                    }
+                    return sum;
+                }
+
+                case 'subtract': {
+                    const minuend = metricValues[formula.minuend];
+                    const subtrahend = metricValues[formula.subtrahend];
+
+                    if (minuend === undefined) throw new Error(`Missing metric: ${formula.minuend}`);
+                    if (subtrahend === undefined) throw new Error(`Missing metric: ${formula.subtrahend}`);
+
+                    return minuend - subtrahend;
+                }
+
+                default:
+                    throw new Error(`Unknown operation: ${operation}`);
+            }
+        }
+
+        /**
+         * Calculates derived metrics using formulas
+         * @param {Object} metricValues - Map of metricId to values from reports
+         * @param {Array} calculatedConfigs - Array of calculated metric configs
+         * @returns {Object} Map of calculated metricId to values
+         */
+        function calculateDerivedMetrics(metricValues, calculatedConfigs) {
+            const results = {};
+
+            for (const config of calculatedConfigs) {
+                try {
+                    console.log(`Calculating ${config.metricName} (${config.metricId})`);
+                    const value = executeFormula(config.formula, metricValues);
+                    results[config.metricId] = value;
+                } catch (error) {
+                    console.error(`Error calculating ${config.metricName}:`, error);
+                    results[config.metricId] = { error: error.message };
+                }
+            }
+
+            return results;
+        }
+
+        /**
+         * Migrates old report_targets localStorage to new metric_targets format
+         * Called on app initialization
+         */
+        function migrateTargetsStorage() {
+            const oldTargets = localStorage.getItem('report_targets');
+            const newTargets = localStorage.getItem('metric_targets');
+
+            // Only migrate if old exists and new doesn't
+            if (oldTargets && !newTargets) {
+                try {
+                    const oldData = JSON.parse(oldTargets);
+                    const newData = {};
+
+                    // Map old reportId keys to new metricId keys
+                    metricConfigs.forEach(config => {
+                        if (config.type === 'report' && oldData[config.reportId] !== undefined) {
+                            newData[config.metricId] = oldData[config.reportId];
+                        }
+                    });
+
+                    localStorage.setItem('metric_targets', JSON.stringify(newData));
+                    console.log('Migrated targets from report_targets to metric_targets:', newData);
+                } catch (e) {
+                    console.error('Error migrating targets:', e);
+                }
+            }
+        }
+
+        // Performance thresholds
+        const thresholds = {
+            success: 0.9,  // 90% or above of target
+            warning: 0.7   // 70-89% of target
+        };
+
+        // ==========================================
+        // OAUTH CONFIGURATION
+        // ==========================================
+        const STORAGE_KEYS = {
+            ACCESS_TOKEN: 'sf_access_token',
+            INSTANCE_URL: 'sf_instance_url',
+            CLIENT_ID: 'sf_client_id',
+            LOGIN_URL: 'sf_login_url',
+            USER_INFO: 'sf_user_info'
+        };
+
+        // Get the current page URL for the callback
+        const redirectUri = window.location.href.split('#')[0].split('?')[0];
+
+        // ==========================================
+        // INITIALIZATION
+        // ==========================================
+        window.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('callbackUrlDisplay').textContent = redirectUri;
+
+            // Migrate old localStorage format if needed
+            migrateTargetsStorage();
+
+            // Validate metric configurations
+            validateConfigs(metricConfigs);
+
+            // Check if we're coming back from OAuth callback
+            if (window.location.hash) {
+                handleOAuthCallback();
+            } else {
+                checkAuthStatus();
+            }
+        });
+
+        function checkAuthStatus() {
+            const accessToken = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
+            const clientId = localStorage.getItem(STORAGE_KEYS.CLIENT_ID);
+
+            if (accessToken) {
+                // Already authenticated
+                showUserInfo();
+                loadScorecard();
+            } else if (clientId) {
+                // Configured but not logged in
+                showLoginSection();
+            } else {
+                // Not configured
+                showSetup();
+            }
+        }
+
+        function showSetup() {
+            document.getElementById('setupSection').classList.remove('hidden');
+            document.getElementById('loginSection').classList.add('hidden');
+            document.getElementById('userInfoSection').classList.add('hidden');
+            document.getElementById('scorecardSection').classList.add('hidden');
+
+            // Pre-fill if exists
+            const clientId = localStorage.getItem(STORAGE_KEYS.CLIENT_ID);
+            const loginUrl = localStorage.getItem(STORAGE_KEYS.LOGIN_URL);
+            if (clientId) document.getElementById('clientId').value = clientId;
+            if (loginUrl) document.getElementById('instanceUrl').value = loginUrl;
+        }
+
+        function showLoginSection() {
+            document.getElementById('setupSection').classList.add('hidden');
+            document.getElementById('loginSection').classList.remove('hidden');
+            document.getElementById('userInfoSection').classList.add('hidden');
+            document.getElementById('scorecardSection').classList.add('hidden');
+        }
+
+        function showUserInfo() {
+            document.getElementById('setupSection').classList.add('hidden');
+            document.getElementById('loginSection').classList.add('hidden');
+            document.getElementById('userInfoSection').classList.remove('hidden');
+            document.getElementById('scorecardSection').classList.remove('hidden');
+
+            const userInfo = JSON.parse(localStorage.getItem(STORAGE_KEYS.USER_INFO) || '{}');
+            document.getElementById('userName').textContent = userInfo.display_name || userInfo.username || 'User';
+            document.getElementById('orgName').textContent = userInfo.organization_name || 'Org';
+
+            // Load opportunity owners for the dropdown
+            loadOpportunityOwners();
+        }
+
+        // ==========================================
+        // OAUTH FLOW
+        // ==========================================
+        function saveConfig() {
+            const clientId = document.getElementById('clientId').value.trim();
+            const loginUrl = document.getElementById('instanceUrl').value.trim();
+
+            if (!clientId) {
+                showError('Please enter your Consumer Key');
+                return;
+            }
+
+            if (!loginUrl) {
+                showError('Please enter your Salesforce login URL');
+                return;
+            }
+
+            localStorage.setItem(STORAGE_KEYS.CLIENT_ID, clientId);
+            localStorage.setItem(STORAGE_KEYS.LOGIN_URL, loginUrl);
+
+            showSuccess('Configuration saved! Click "Login with Salesforce" to connect.');
+            showLoginSection();
+        }
+
+        function loginWithSalesforce() {
+            const clientId = localStorage.getItem(STORAGE_KEYS.CLIENT_ID);
+            const loginUrl = localStorage.getItem(STORAGE_KEYS.LOGIN_URL);
+
+            if (!clientId) {
+                showError('Please configure your Consumer Key first');
+                showSetup();
+                return;
+            }
+
+            // OAuth 2.0 User-Agent Flow (Token Flow)
+            const authUrl = `${loginUrl}/services/oauth2/authorize?` +
+                `response_type=token&` +
+                `client_id=${encodeURIComponent(clientId)}&` +
+                `redirect_uri=${encodeURIComponent(redirectUri)}`;
+
+            window.location.href = authUrl;
+        }
+
+        function handleOAuthCallback() {
+            const hash = window.location.hash.substring(1);
+            const params = new URLSearchParams(hash);
+
+            const accessToken = params.get('access_token');
+            const instanceUrl = params.get('instance_url');
+
+            if (accessToken && instanceUrl) {
+                // Save tokens
+                localStorage.setItem(STORAGE_KEYS.ACCESS_TOKEN, accessToken);
+                localStorage.setItem(STORAGE_KEYS.INSTANCE_URL, instanceUrl);
+
+                // Clear the hash from URL
+                window.history.replaceState(null, null, window.location.pathname);
+
+                // Fetch user info
+                fetchUserInfo(accessToken, instanceUrl);
+            } else if (params.get('error')) {
+                showError('OAuth Error: ' + params.get('error_description'));
+                showLoginSection();
+            }
+        }
+
+        async function fetchUserInfo(accessToken, instanceUrl) {
+            try {
+                const response = await fetch(`${instanceUrl}/services/oauth2/userinfo`, {
+                    headers: {
+                        'Authorization': `Bearer ${accessToken}`
+                    }
+                });
+
+                if (response.ok) {
+                    const userInfo = await response.json();
+                    localStorage.setItem(STORAGE_KEYS.USER_INFO, JSON.stringify(userInfo));
+                    showSuccess('Successfully connected to Salesforce!');
+                    showUserInfo();
+                    loadScorecard();
+                } else {
+                    throw new Error('Failed to fetch user info');
+                }
+            } catch (error) {
+                console.error('Error fetching user info:', error);
+                showError('Connected but could not fetch user info: ' + error.message);
+                showUserInfo();
+                loadScorecard();
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem(STORAGE_KEYS.ACCESS_TOKEN);
+            localStorage.removeItem(STORAGE_KEYS.INSTANCE_URL);
+            localStorage.removeItem(STORAGE_KEYS.USER_INFO);
+            showLoginSection();
+            showSuccess('Logged out successfully');
+        }
+
+        // ==========================================
+        // UI HELPERS
+        // ==========================================
+        function showError(message) {
+            const errorDiv = document.getElementById('errorMessage');
+            errorDiv.textContent = message;
+            errorDiv.classList.remove('hidden');
+            setTimeout(() => errorDiv.classList.add('hidden'), 8000);
+        }
+
+        function showSuccess(message) {
+            const successDiv = document.getElementById('successMessage');
+            successDiv.textContent = message;
+            successDiv.classList.remove('hidden');
+            setTimeout(() => successDiv.classList.add('hidden'), 3000);
+        }
+
+        function showEditTargets() {
+            // Hide scorecard section
+            document.getElementById('scorecardSection').classList.add('hidden');
+
+            // Show edit targets section
+            const editSection = document.getElementById('editTargetsSection');
+            editSection.classList.remove('hidden');
+
+            const inputsContainer = document.getElementById('targetInputs');
+
+            // Clear existing inputs
+            inputsContainer.innerHTML = '';
+
+            // Get current configs with saved or default targets
+            const configs = getMetricConfigs();
+
+            // Separate by type for organized display
+            const reportMetrics = configs.filter(c => c.type === 'report');
+            const calculatedMetrics = configs.filter(c => c.type === 'calculated');
+
+            // Report-based metrics section
+            if (reportMetrics.length > 0) {
+                const header = document.createElement('h3');
+                header.style.cssText = 'margin: 20px 0 10px 0; color: #555; font-size: 16px;';
+                header.textContent = 'Report-Based Metrics';
+                inputsContainer.appendChild(header);
+
+                reportMetrics.forEach(config => {
+                    const inputGroup = document.createElement('div');
+                    inputGroup.className = 'target-input-group';
+                    inputGroup.innerHTML = `
+                        <label for="target_${config.metricId}">${config.metricName}</label>
+                        <input
+                            type="number"
+                            id="target_${config.metricId}"
+                            value="${config.target}"
+                            min="0"
+                            step="${config.unit === '%' ? '0.1' : '1'}"
+                            placeholder="Enter target"
+                        />
+                    `;
+                    inputsContainer.appendChild(inputGroup);
+                });
+            }
+
+            // Calculated metrics section
+            if (calculatedMetrics.length > 0) {
+                const header = document.createElement('h3');
+                header.style.cssText = 'margin: 30px 0 10px 0; color: #555; font-size: 16px;';
+                header.textContent = 'Calculated Metrics';
+                inputsContainer.appendChild(header);
+
+                calculatedMetrics.forEach(config => {
+                    const inputGroup = document.createElement('div');
+                    inputGroup.className = 'target-input-group';
+                    inputGroup.innerHTML = `
+                        <label for="target_${config.metricId}">${config.metricName}</label>
+                        <input
+                            type="number"
+                            id="target_${config.metricId}"
+                            value="${config.target}"
+                            min="0"
+                            step="${config.unit === '%' ? '0.1' : '1'}"
+                            placeholder="Enter target"
+                        />
+                    `;
+                    inputsContainer.appendChild(inputGroup);
+                });
+            }
+        }
+
+        function showScorecard() {
+            // Hide edit targets section
+            document.getElementById('editTargetsSection').classList.add('hidden');
+
+            // Show scorecard section
+            document.getElementById('scorecardSection').classList.remove('hidden');
+        }
+
+        function saveTargets() {
+            const configs = getMetricConfigs();
+            const newTargets = {};
+
+            // Collect new target values from inputs
+            configs.forEach(config => {
+                const input = document.getElementById(`target_${config.metricId}`);
+                if (input) {
+                    const value = parseFloat(input.value);
+                    if (!isNaN(value) && value >= 0) {
+                        newTargets[config.metricId] = value;
+                    } else {
+                        newTargets[config.metricId] = config.target; // Keep existing if invalid
+                    }
+                }
+            });
+
+            // Save to localStorage
+            saveTargetsToStorage(newTargets);
+
+            // Show success message
+            showSuccess('Targets updated successfully!');
+
+            // Go back to scorecard
+            showScorecard();
+
+            // Reload scorecard with new targets
+            loadScorecard();
+        }
+
+        // ==========================================
+        // SALESFORCE API CALLS
+        // ==========================================
+        async function fetchOpportunityOwners() {
+            const accessToken = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
+            const instanceUrl = localStorage.getItem(STORAGE_KEYS.INSTANCE_URL);
+
+            // Filter to only users whose role contains "VC AEs"
+            const query = "SELECT Id, Name, UserRole.Name FROM User WHERE Id IN (SELECT OwnerId FROM Opportunity) AND UserRole.Name LIKE '%VC AEs%' ORDER BY Name";
+            const url = `${instanceUrl}/services/data/v59.0/query?q=${encodeURIComponent(query)}`;
+
+            try {
+                const response = await fetch(url, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${accessToken}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('Filtered owners by role containing "VC AEs":', data.records.length, 'users found');
+                    return data.records;
+                } else {
+                    console.error('Failed to fetch owners');
+                    return [];
+                }
+            } catch (error) {
+                console.error('Error fetching owners:', error);
+                return [];
+            }
+        }
+
+        async function loadOpportunityOwners() {
+            const owners = await fetchOpportunityOwners();
+            const select = document.getElementById('ownerSelect');
+
+            select.innerHTML = '<option value="">All Owners</option>';
+
+            owners.forEach(owner => {
+                const option = document.createElement('option');
+                option.value = owner.Name;  // Use name as value to match report data
+                option.textContent = owner.Name;
+                select.appendChild(option);
+            });
+        }
+
+        async function fetchReportData(reportId, ownerId = null) {
+            const accessToken = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
+            const instanceUrl = localStorage.getItem(STORAGE_KEYS.INSTANCE_URL);
+
+            // Always fetch with details to get row-level data
+            let url = `${instanceUrl}/services/data/v59.0/analytics/reports/${reportId}?includeDetails=true`;
+
+            console.log('Fetching report:', reportId);
+            console.log('Owner filter:', ownerId || 'None');
+
+            const response = await fetch(url, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${accessToken}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            console.log('Response status:', response.status);
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                console.error('Error response:', errorText);
+
+                if (response.status === 401) {
+                    // Token expired
+                    logout();
+                    throw new Error('Session expired. Please log in again.');
+                }
+
+                let errorMessage = `HTTP ${response.status}: ${response.statusText}`;
+                try {
+                    const errorJson = JSON.parse(errorText);
+                    if (errorJson[0] && errorJson[0].message) {
+                        errorMessage += ` - ${errorJson[0].message}`;
+                    }
+                } catch (e) {
+                    errorMessage += ` - ${errorText}`;
+                }
+
+                throw new Error(errorMessage);
+            }
+
+            return await response.json();
+        }
+
+        function extractMetricValue(reportData, config, ownerId = null) {
+            try {
+                const factMap = reportData.factMap;
+
+                // If no owner filter, use grand totals
+                if (!ownerId) {
+                    if (factMap && factMap['T!T']) {
+                        const grandTotal = factMap['T!T'];
+                        const aggregateValues = grandTotal.aggregates;
+
+                        if (aggregateValues && aggregateValues.length > 0) {
+                            if (config.aggregationType === 'sum' || config.aggregationType === 'average') {
+                                const value = aggregateValues[0].value;
+                                return parseFloat(value) || 0;
+                            }
+
+                            if (config.aggregationType === 'count') {
+                                return parseInt(aggregateValues[0].value) || grandTotal.rowCount || 0;
+                            }
+                        }
+                    }
+
+                    if (config.aggregationType === 'count') {
+                        const rowCount = Object.keys(factMap).filter(key => key.startsWith('0')).length;
+                        return rowCount;
+                    }
+
+                    return 0;
+                }
+
+                // Filter by owner using groupings (for summary reports)
+                console.log('Filtering by owner:', ownerId);
+
+                // Get current month/year for filtering
+                const now = new Date();
+                const currentMonth = now.toLocaleString('en-US', { month: 'long', year: 'numeric' }); // e.g., "January 2026"
+                console.log('Current month:', currentMonth);
+
+                // Check if this is a summary report with groupings
+                if (reportData.groupingsDown && reportData.groupingsDown.groupings) {
+                    const topLevelGroupings = reportData.groupingsDown.groupings;
+                    console.log('Found', topLevelGroupings.length, 'top-level groupings');
+
+                    // Find the grouping that matches the owner name
+                    for (let grouping of topLevelGroupings) {
+                        console.log('Checking grouping:', grouping.label, 'vs', ownerId);
+                        if (grouping.label === ownerId) {
+                            // Found the matching owner grouping
+                            const groupKey = grouping.key;
+                            console.log('Found matching owner grouping with key:', groupKey);
+
+                            // Check if there are sub-groupings (date groupings)
+                            if (grouping.groupings && grouping.groupings.length > 0) {
+                                console.log('Found', grouping.groupings.length, 'date sub-groupings');
+
+                                // Find the sub-grouping that matches the current month
+                                for (let dateGrouping of grouping.groupings) {
+                                    console.log('Checking date grouping:', dateGrouping.label);
+
+                                    // Check if this date grouping matches the current month
+                                    if (dateGrouping.label === currentMonth) {
+                                        const dateFactKey = dateGrouping.key + '!T';  // Add !T suffix for totals
+                                        console.log('Found current month grouping with key:', dateFactKey);
+
+                                        // Get the data for this specific month
+                                        if (factMap && factMap[dateFactKey]) {
+                                            const monthFact = factMap[dateFactKey];
+                                            console.log('Month fact data:', monthFact);
+                                            console.log('All aggregates:', monthFact.aggregates);
+
+                                            if (monthFact.aggregates && monthFact.aggregates.length > 0) {
+                                                let value;
+
+                                                if (config.aggregationType === 'count') {
+                                                    // Record count is typically the last aggregate
+                                                    value = monthFact.aggregates[monthFact.aggregates.length - 1].value;
+                                                    console.log('Using last aggregate (record count):', value);
+                                                } else {
+                                                    value = monthFact.aggregates[0].value;
+                                                    console.log('Using first aggregate:', value);
+                                                }
+
+                                                return parseInt(value) || parseFloat(value) || 0;
+                                            }
+                                        } else {
+                                            console.log('factMap[' + dateFactKey + '] not found');
+                                        }
+                                    }
+                                }
+
+                                console.log('No matching month grouping found for', currentMonth);
+                                return 0;
+                            } else {
+                                // No date sub-groupings, use the owner total
+                                const factKey = groupKey + '!T';
+                                console.log('No date sub-groupings, using owner total:', factKey);
+
+                                if (factMap && factMap[factKey]) {
+                                    const ownerFact = factMap[factKey];
+                                    console.log('Owner fact data:', ownerFact);
+
+                                    if (ownerFact.aggregates && ownerFact.aggregates.length > 0) {
+                                        let value;
+
+                                        if (config.aggregationType === 'count') {
+                                            value = ownerFact.aggregates[ownerFact.aggregates.length - 1].value;
+                                            console.log('Using last aggregate (record count):', value);
+                                        } else {
+                                            value = ownerFact.aggregates[0].value;
+                                            console.log('Using first aggregate:', value);
+                                        }
+
+                                        return parseInt(value) || parseFloat(value) || 0;
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    console.log('No matching owner grouping found');
+                    return 0;
+                }
+
+                console.log('Report does not have groupingsDown structure');
+                return 0;
+            } catch (error) {
+                console.error('Error extracting metric value:', error);
+                return 0;
+            }
+        }
+
+        function calculateStatus(actual, target) {
+            const percentage = actual / target;
+            if (percentage >= thresholds.success) return 'success';
+            if (percentage >= thresholds.warning) return 'warning';
+            return 'danger';
+        }
+
+        function formatNumber(num, unit) {
+            if (unit === '$') {
+                return '$' + num.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+            }
+            if (unit === '%') {
+                return num.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 1 }) + '%';
+            }
+            return num.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+        }
+
+        /**
+         * Creates an SVG circular gauge (speedometer style)
+         * @param {number} percentage - Achievement percentage (0-100+)
+         * @param {string} status - Status color: 'success', 'warning', or 'danger'
+         * @returns {string} SVG markup for the circular gauge
+         */
+        function createCircularGauge(percentage, status) {
+            // SVG dimensions
+            const size = 200;
+            const strokeWidth = 16;
+            const center = size / 2;
+            const radius = (size - strokeWidth) / 2;
+
+            // Calculate the arc path for a semi-circle (180 degrees)
+            // Start at 180° (9 o'clock), end at 360° (3 o'clock)
+            const startAngle = 180;
+            const endAngle = 360;
+            const totalDegrees = endAngle - startAngle;
+
+            // Clamp visual arc at 100% so it doesn't wrap around
+            const visualPercentage = Math.min(percentage, 100);
+            const progressDegrees = (visualPercentage / 100) * totalDegrees;
+
+            // Convert angles to radians for calculation
+            const startRad = (startAngle * Math.PI) / 180;
+            const progressRad = (progressDegrees * Math.PI) / 180;
+
+            // Calculate arc path coordinates
+            const startX = center + radius * Math.cos(startRad);
+            const startY = center + radius * Math.sin(startRad);
+            const endX = center + radius * Math.cos(startRad + progressRad);
+            const endY = center + radius * Math.sin(startRad + progressRad);
+
+            // Determine if arc should be "large" (>180°)
+            const largeArcFlag = progressDegrees > 180 ? 1 : 0;
+
+            // Background track path (full semi-circle)
+            const backgroundEndX = center + radius * Math.cos(startRad + (totalDegrees * Math.PI) / 180);
+            const backgroundEndY = center + radius * Math.sin(startRad + (totalDegrees * Math.PI) / 180);
+
+            // Color based on status
+            const colors = {
+                success: '#00D4AA',
+                warning: '#F59E0B',
+                danger: '#EF4444'
+            };
+            const progressColor = colors[status] || colors.success;
+
+            return `
+                <svg class="gauge-svg" viewBox="0 0 ${size} ${size}" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Background track (gray semi-circle) -->
+                    <path
+                        d="M ${startX} ${startY} A ${radius} ${radius} 0 1 1 ${backgroundEndX} ${backgroundEndY}"
+                        fill="none"
+                        stroke="#E5E7EB"
+                        stroke-width="${strokeWidth}"
+                        stroke-linecap="round"
+                    />
+
+                    <!-- Progress arc (colored) -->
+                    ${progressDegrees > 0 ? `
+                    <path
+                        d="M ${startX} ${startY} A ${radius} ${radius} 0 ${largeArcFlag} 1 ${endX} ${endY}"
+                        fill="none"
+                        stroke="${progressColor}"
+                        stroke-width="${strokeWidth}"
+                        stroke-linecap="round"
+                    />
+                    ` : ''}
+
+                    <!-- Center percentage text -->
+                    <text
+                        x="${center}"
+                        y="${center + 10}"
+                        text-anchor="middle"
+                        font-size="36"
+                        font-weight="700"
+                        fill="#0A0A0A"
+                    >${percentage.toFixed(0)}%</text>
+
+                    <!-- Achievement label -->
+                    <text
+                        x="${center}"
+                        y="${center + 35}"
+                        text-anchor="middle"
+                        font-size="12"
+                        font-weight="600"
+                        fill="#666"
+                        letter-spacing="0.5"
+                    >ACHIEVEMENT</text>
+                </svg>
+            `;
+        }
+
+        function createMetricCard(config, actual, error = null) {
+            const percentage = (actual / config.target) * 100;
+            const status = calculateStatus(actual, config.target);
+
+            // Only show report link for report-based metrics
+            const reportLink = config.type === 'report'
+                ? `<a href="https://rho.lightning.force.com/${config.reportId}" target="_blank" style="font-size: 11px; color: #00D4AA; text-decoration: none; display: block; margin-top: 4px;">View Report</a>`
+                : `<div style="font-size: 11px; color: #999; margin-top: 4px;">Calculated Metric</div>`;
+
+            // Create the circular gauge
+            const gaugeHTML = createCircularGauge(percentage, status);
+
+            return `
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <div>
+                            <div class="metric-name">${config.metricName}</div>
+                            ${reportLink}
+                        </div>
+                        <div class="metric-status status-${status}">
+                            ${status === 'success' ? '✓ On Track' : status === 'warning' ? '⚠ At Risk' : '✗ Behind'}
+                        </div>
+                    </div>
+
+                    <!-- Circular Gauge -->
+                    <div class="gauge-container">
+                        ${gaugeHTML}
+                    </div>
+
+                    <!-- Metric Values -->
+                    <div class="metric-values">
+                        <div class="value-item">
+                            <div class="value-label">Current</div>
+                            <div class="value-number">${formatNumber(actual, config.unit)}</div>
+                        </div>
+                        <div class="value-item">
+                            <div class="value-label">Target</div>
+                            <div class="value-number">${formatNumber(config.target, config.unit)}</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        async function loadScorecard() {
+            const accessToken = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
+            if (!accessToken) {
+                showError('Not authenticated. Please log in.');
+                showLoginSection();
+                return;
+            }
+
+            document.getElementById('loading').classList.remove('hidden');
+
+            try {
+                const scorecardDiv = document.getElementById('scorecard');
+                scorecardDiv.innerHTML = '';
+
+                // Get selected owner from dropdown
+                const ownerSelect = document.getElementById('ownerSelect');
+                const selectedOwnerId = ownerSelect ? ownerSelect.value : null;
+
+                // Get all configs with current targets from localStorage
+                const allConfigs = getMetricConfigs();
+
+                // Filter to get only report-based metrics
+                const reportConfigs = allConfigs.filter(c => c.type === 'report');
+                const calculatedConfigs = allConfigs.filter(c => c.type === 'calculated');
+
+                console.log('Loading scorecard with:', {
+                    reportMetrics: reportConfigs.length,
+                    calculatedMetrics: calculatedConfigs.length,
+                    selectedOwner: selectedOwnerId || 'All Owners'
+                });
+
+                // Fetch all reports in parallel
+                const reportMetrics = await Promise.all(
+                    reportConfigs.map(async (config) => {
+                        try {
+                            const reportData = await fetchReportData(config.reportId, selectedOwnerId);
+                            const actualValue = extractMetricValue(reportData, config, selectedOwnerId);
+                            return { config, actualValue };
+                        } catch (error) {
+                            console.error(`Error loading report ${config.reportId}:`, error);
+                            return { config, actualValue: 0, error: error.message };
+                        }
+                    })
+                );
+
+                // Build metricValues map from report results
+                const metricValues = {};
+                reportMetrics.forEach(({ config, actualValue, error }) => {
+                    if (!error) {
+                        metricValues[config.metricId] = actualValue;
+                    }
+                });
+
+                console.log('Report metric values:', metricValues);
+
+                // Calculate derived metrics
+                const calculatedValues = calculateDerivedMetrics(metricValues, calculatedConfigs);
+                console.log('Calculated metric values:', calculatedValues);
+
+                // Combine all values
+                Object.assign(metricValues, calculatedValues);
+
+                // Display all metrics in order
+                allConfigs.forEach(config => {
+                    const value = metricValues[config.metricId];
+
+                    // Check if this metric has an error
+                    const hasError = typeof value === 'object' && value.error;
+                    const error = hasError ? value.error : null;
+                    const actualValue = hasError ? 0 : value;
+
+                    // Find if there was a fetch error for report metrics
+                    const reportError = reportMetrics.find(m => m.config.metricId === config.metricId && m.error);
+                    const finalError = reportError ? reportError.error : error;
+
+                    if (finalError) {
+                        scorecardDiv.innerHTML += `
+                            <div class="metric-card">
+                                <div class="metric-name">${config.metricName}</div>
+                                <div style="color: #dc2626; margin-top: 10px;">Error: ${finalError}</div>
+                                ${config.type === 'calculated' ? '<div style="color: #999; margin-top: 5px; font-size: 12px;">Check formula dependencies</div>' : ''}
+                            </div>
+                        `;
+                    } else {
+                        scorecardDiv.innerHTML += createMetricCard(config, actualValue, finalError);
+                    }
+                });
+
+            } catch (error) {
+                console.error('Error loading scorecard:', error);
+                showError('Failed to load scorecard: ' + error.message);
+            } finally {
+                document.getElementById('loading').classList.add('hidden');
+            }
+        }
+    </script>
+</body>
+</html>

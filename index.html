@@ -532,13 +532,12 @@
             </div>
 
             <div id="loginSection" class="hidden">
-                <div class="info-box">
-                    <strong>Ready to Connect!</strong>
-                    <p>Click the button below to log in with your Salesforce credentials. You'll be redirected to Salesforce to authorize this app.</p>
+                <div style="text-align: center; padding: 40px 0;">
+                    <p style="color: #666; margin-bottom: 30px; font-size: 16px;">
+                        Connect to Salesforce to view your performance metrics
+                    </p>
+                    <button class="login-btn" onclick="loginWithSalesforce()">Login with Salesforce</button>
                 </div>
-                <button class="login-btn" onclick="loginWithSalesforce()">Login with Salesforce</button>
-                <br><br>
-                <button class="config-btn" onclick="showSetup()">Change Configuration</button>
             </div>
 
             <div id="userInfoSection" class="hidden">
@@ -876,6 +875,14 @@
         // ==========================================
         // OAUTH CONFIGURATION
         // ==========================================
+
+        // Pre-configured settings for one-click login
+        // These are safe to hardcode (Consumer Key is public, not a secret)
+        const PRECONFIGURED = {
+            CLIENT_ID: '3MVG9_XwsqeYoueJz1.VgYcbyC6hQIE9I8DJwaiwPCHM0rJIKMG8_PhoTzSw_YEk.2MBHfnIStQRxta_rD6pI',
+            LOGIN_URL: 'http://rho.lightning.force.com/'
+        };
+
         const STORAGE_KEYS = {
             ACCESS_TOKEN: 'sf_access_token',
             INSTANCE_URL: 'sf_instance_url',
@@ -909,18 +916,26 @@
 
         function checkAuthStatus() {
             const accessToken = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
-            const clientId = localStorage.getItem(STORAGE_KEYS.CLIENT_ID);
+            let clientId = localStorage.getItem(STORAGE_KEYS.CLIENT_ID);
+            let loginUrl = localStorage.getItem(STORAGE_KEYS.LOGIN_URL);
+
+            // Auto-configure with pre-set values if not already configured
+            if (!clientId) {
+                clientId = PRECONFIGURED.CLIENT_ID;
+                localStorage.setItem(STORAGE_KEYS.CLIENT_ID, clientId);
+            }
+            if (!loginUrl) {
+                loginUrl = PRECONFIGURED.LOGIN_URL;
+                localStorage.setItem(STORAGE_KEYS.LOGIN_URL, loginUrl);
+            }
 
             if (accessToken) {
                 // Already authenticated
                 showUserInfo();
                 loadScorecard();
-            } else if (clientId) {
-                // Configured but not logged in
-                showLoginSection();
             } else {
-                // Not configured
-                showSetup();
+                // Show login button (skip setup entirely)
+                showLoginSection();
             }
         }
 

@@ -19,6 +19,20 @@
             color: #0A0A0A;
         }
 
+        /* Dark auth background */
+        body.auth-mode {
+            background: #1A1A1A;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+        }
+
+        body.auth-mode .container {
+            max-width: 480px;
+            width: 100%;
+        }
+
         .container {
             max-width: 1200px;
             margin: 0 auto;
@@ -33,18 +47,27 @@
             box-shadow: 0 4px 6px -1px rgba(10, 10, 10, 0.08);
         }
 
+        /* Auth card styling for dark mode */
+        body.auth-mode .card {
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+            border: none;
+            padding: 48px 40px;
+        }
+
         h1 {
             color: #0A0A0A;
             margin-bottom: 0;
-            font-size: 28px;
-            font-weight: 600;
+            font-size: 32px;
+            font-weight: 700;
+            line-height: 1.2;
         }
 
         h2 {
             color: #0A0A0A;
             margin-bottom: 20px;
-            font-size: 20px;
-            font-weight: 600;
+            font-size: 28px;
+            font-weight: 700;
+            line-height: 1.3;
         }
 
         h3 {
@@ -85,11 +108,11 @@
 
         input:focus {
             outline: none;
-            border-color: #00D4AA;
+            border-color: #00EBC0;
         }
 
         button {
-            background: #00D4AA;
+            background: #00EBC0;
             color: white;
             padding: 14px 28px;
             border: none;
@@ -117,9 +140,38 @@
         }
 
         .login-btn {
-            background: #00a1e0;
+            background: #0A0A0A;
             font-size: 18px;
             padding: 16px 32px;
+            width: 100%;
+        }
+
+        .login-btn:hover {
+            background: #2A2A2A;
+        }
+
+        /* Rho logo styling */
+        .auth-logo {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .auth-logo svg {
+            width: 80px;
+            height: auto;
+        }
+
+        .auth-title {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .auth-subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 32px;
+            font-size: 15px;
+            line-height: 1.6;
         }
 
         .logout-btn {
@@ -158,28 +210,61 @@
             background: #FFFFFF;
             border: 1px solid #E5E7EB;
             border-radius: 8px;
-            padding: 24px;
+            padding: 18px;
             transition: all 0.2s;
             box-shadow: 0 1px 2px 0 rgba(10, 10, 10, 0.05);
         }
 
         .metric-card:hover {
-            border-color: #00D4AA;
+            border-color: #00EBC0;
             box-shadow: 0 4px 6px -1px rgba(10, 10, 10, 0.08);
             transform: translateY(-2px);
+        }
+
+        .metric-card.aggregate {
+            grid-column: span 2;
+            background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+            border: 2px solid #00EBC0;
+            padding: 12px 20px;
+        }
+
+        .aggregate .metric-header {
+            margin-bottom: 8px;
+        }
+
+        .aggregate .metric-name {
+            font-size: 24px;
+        }
+
+        .aggregate .gauge-percentage {
+            font-size: 56px;
+        }
+
+        .aggregate-gauge {
+            margin: 32px 0 8px 0;
+        }
+
+        .aggregate-gauge .gauge-svg {
+            max-width: 300px;
+            width: 100%;
+        }
+
+        .aggregate .metric-values {
+            margin-top: 0;
         }
 
         .metric-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 15px;
+            margin-bottom: 8px;
         }
 
         .metric-name {
             font-size: 18px;
             font-weight: 700;
             color: #333;
+            line-height: 1.4;
         }
 
         .metric-status {
@@ -208,7 +293,7 @@
         .metric-values {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 15px;
+            margin-bottom: 5px;
             font-size: 14px;
         }
 
@@ -251,7 +336,7 @@
         }
 
         .progress-success {
-            background: linear-gradient(90deg, #00D4AA 0%, #00BF99 100%);
+            background: linear-gradient(90deg, #10b981 0%, #059669 100%);
         }
 
         .progress-warning {
@@ -280,6 +365,7 @@
             border-radius: 6px;
             margin-bottom: 20px;
             border-left: 4px solid #dc2626;
+            text-align: center;
         }
 
         .success {
@@ -289,6 +375,7 @@
             border-radius: 6px;
             margin-bottom: 20px;
             border-left: 4px solid #10b981;
+            text-align: center;
         }
 
         .info-box {
@@ -326,7 +413,7 @@
         }
 
         .refresh-btn {
-            background: #00D4AA;
+            background: #00EBC0;
             margin-right: 10px;
         }
 
@@ -449,11 +536,11 @@
 
         .target-input-group input:focus {
             outline: none;
-            border-color: #00D4AA;
+            border-color: #00EBC0;
         }
 
         a {
-            color: #00D4AA;
+            color: #00EBC0;
             text-decoration: none;
         }
 
@@ -463,14 +550,14 @@
         }
 
         input:focus, select:focus {
-            box-shadow: 0 0 0 3px rgba(0, 212, 170, 0.1);
+            box-shadow: 0 0 0 3px rgba(0, 235, 192, 0.1);
         }
 
         .gauge-container {
             display: flex;
             justify-content: center;
             align-items: center;
-            margin: 20px 0;
+            margin: 32px 0 8px 0;
             position: relative;
         }
 
@@ -493,12 +580,12 @@
             font-weight: 600;
             color: #666;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.8px;
         }
 
         .insights-card {
             background: linear-gradient(135deg, #0A0A0A 0%, #1A1A1A 100%);
-            border: 1px solid #00D4AA;
+            border: 1px solid #00EBC0;
             border-radius: 8px;
             padding: 24px;
             margin-bottom: 20px;
@@ -519,7 +606,7 @@
         .insights-title {
             font-size: 18px;
             font-weight: 600;
-            color: #00D4AA;
+            color: #00EBC0;
         }
 
         .insights-summary {
@@ -538,10 +625,9 @@
         .insights-recommendations h4 {
             font-size: 16px;
             font-weight: 600;
-            color: #00D4AA;
+            color: #00EBC0;
             margin-bottom: 12px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 1px;
         }
 
         .recommendation-item {
@@ -550,19 +636,19 @@
             gap: 10px;
             margin-bottom: 8px;
             padding: 8px;
-            background: rgba(0, 212, 170, 0.05);
+            background: rgba(0, 235, 192, 0.05);
             border-radius: 4px;
         }
 
         .recommendation-icon {
-            color: #00D4AA;
+            color: #00EBC0;
             font-weight: 700;
             flex-shrink: 0;
         }
 
         .recommendation-text {
-            font-size: 14px;
-            line-height: 1.5;
+            font-size: 16px;
+            line-height: 1.6;
             color: #E0E0E0;
         }
 
@@ -594,7 +680,7 @@
         }
 
         .view-toggle-btn.active {
-            background: #00D4AA;
+            background: #00EBC0;
             color: white;
         }
 
@@ -602,7 +688,7 @@
             margin-top: 12px;
             padding: 12px;
             background: #F8F9FA;
-            border-left: 3px solid #00D4AA;
+            border-left: 3px solid #00EBC0;
             border-radius: 4px;
             font-size: 13px;
             color: #666;
@@ -628,10 +714,21 @@
 <body>
     <div class="container">
         <div id="authCard" class="card">
-            <h1>Rho Sales Rep Scorecard</h1>
-            <p class="subtitle">Track your metrics against targets in real-time</p>
+            <div id="authCardHeader">
+                <h1>Rho Sales Rep Scorecard</h1>
+                <p class="subtitle">Track your metrics against targets in real-time</p>
+            </div>
 
             <div id="setupSection" class="hidden">
+                <div class="auth-logo">
+                    <svg viewBox="0 0 120 40" xmlns="http://www.w3.org/2000/svg">
+                        <text x="60" y="30" font-family="Arial, sans-serif" font-size="32" font-weight="700" text-anchor="middle" fill="#0A0A0A">Rho</text>
+                    </svg>
+                </div>
+                <div class="auth-title">
+                    <h2 style="margin: 0; font-size: 24px;">Setup Configuration</h2>
+                </div>
+
                 <div class="info-box">
                     <strong>First Time Setup - Create a Connected App in Salesforce:</strong>
                     <ol>
@@ -657,16 +754,22 @@
                     <small style="color: #666; margin-top: 5px;">Use https://test.salesforce.com for sandbox</small>
                 </div>
 
-                <button onclick="saveConfig()">Save Configuration</button>
+                <button onclick="saveConfig()" style="width: 100%;">Save Configuration</button>
             </div>
 
             <div id="loginSection" class="hidden">
-                <div style="text-align: center; padding: 40px 0;">
-                    <p style="color: #666; margin-bottom: 30px; font-size: 16px;">
-                        Connect to Salesforce to view your performance metrics
-                    </p>
-                    <button class="login-btn" onclick="loginWithSalesforce()">Login with Salesforce</button>
+                <div class="auth-logo">
+                    <svg viewBox="0 0 120 40" xmlns="http://www.w3.org/2000/svg">
+                        <text x="60" y="30" font-family="Arial, sans-serif" font-size="32" font-weight="700" text-anchor="middle" fill="#0A0A0A">Rho</text>
+                    </svg>
                 </div>
+                <div class="auth-title">
+                    <h2 style="margin: 0; font-size: 24px;">Sales Rep Scorecard</h2>
+                </div>
+                <div class="auth-subtitle">
+                    Connect to Salesforce to view your performance metrics and track your progress in real-time.
+                </div>
+                <button class="login-btn" onclick="loginWithSalesforce()">Sign in with Salesforce</button>
             </div>
 
             <div id="errorMessage" class="error hidden"></div>
@@ -1137,7 +1240,11 @@
         }
 
         function showSetup() {
+            // Enable auth mode styling
+            document.body.classList.add('auth-mode');
+
             document.getElementById('authCard').classList.remove('hidden');
+            document.getElementById('authCardHeader').classList.add('hidden');
             document.getElementById('setupSection').classList.remove('hidden');
             document.getElementById('loginSection').classList.add('hidden');
             document.getElementById('userInfoSection').classList.add('hidden');
@@ -1151,7 +1258,11 @@
         }
 
         function showLoginSection() {
+            // Enable auth mode styling
+            document.body.classList.add('auth-mode');
+
             document.getElementById('authCard').classList.remove('hidden');
+            document.getElementById('authCardHeader').classList.add('hidden');
             document.getElementById('setupSection').classList.add('hidden');
             document.getElementById('loginSection').classList.remove('hidden');
             document.getElementById('userInfoSection').classList.add('hidden');
@@ -1159,7 +1270,11 @@
         }
 
         function showUserInfo() {
+            // Disable auth mode styling
+            document.body.classList.remove('auth-mode');
+
             document.getElementById('authCard').classList.add('hidden');
+            document.getElementById('authCardHeader').classList.remove('hidden');
             document.getElementById('setupSection').classList.add('hidden');
             document.getElementById('loginSection').classList.add('hidden');
             document.getElementById('userInfoSection').classList.remove('hidden');
@@ -1264,8 +1379,17 @@
             localStorage.removeItem(STORAGE_KEYS.ACCESS_TOKEN);
             localStorage.removeItem(STORAGE_KEYS.INSTANCE_URL);
             localStorage.removeItem(STORAGE_KEYS.USER_INFO);
+
+            // Clear any displayed messages first
+            document.getElementById('errorMessage').classList.add('hidden');
+            document.getElementById('successMessage').classList.add('hidden');
+
             showLoginSection();
-            showSuccess('Logged out successfully');
+
+            // Show success message after a brief delay to ensure UI is ready
+            setTimeout(() => {
+                showSuccess('Logged out successfully');
+            }, 100);
         }
 
         // ==========================================
@@ -1713,6 +1837,48 @@
         }
 
         /**
+         * Calculates aggregate performance score across all metrics
+         * @param {Array} metricsData - Array of {config, actual, status}
+         * @param {string} viewMode - 'standard' or 'pace'
+         * @returns {Object} {score, totalMetrics, percentage, status}
+         */
+        function calculateAggregateScore(metricsData, viewMode) {
+            const monthProgress = getMonthProgress();
+            let totalScore = 0;
+            const totalMetrics = metricsData.length;
+
+            metricsData.forEach(metric => {
+                let metricScore = 0;
+
+                if (viewMode === 'pace') {
+                    // Pace-adjusted: actual ÷ expected-by-now
+                    const expected = getPaceAdjustedTarget(metric.config.target, monthProgress.percentElapsed);
+                    metricScore = expected > 0 ? metric.actual / expected : 0;
+                } else {
+                    // Standard: actual ÷ target
+                    metricScore = metric.config.target > 0 ? metric.actual / metric.config.target : 0;
+                }
+
+                totalScore += metricScore;
+            });
+
+            // Calculate percentage: (totalScore / totalMetrics) * 100
+            const percentage = (totalScore / totalMetrics) * 100;
+
+            // Determine status based on percentage
+            let status = 'danger';
+            if (percentage >= 90) status = 'success';
+            else if (percentage >= 70) status = 'warning';
+
+            return {
+                score: totalScore,
+                totalMetrics: totalMetrics,
+                percentage: percentage,
+                status: status
+            };
+        }
+
+        /**
          * Generates AI-powered insights and recommendations
          * @param {Array} metricsData - Array of {config, actual, status}
          * @param {string} ownerName - Name of the selected owner
@@ -1905,7 +2071,7 @@
 
             // Color based on status
             const colors = {
-                success: '#00D4AA',
+                success: '#10b981',
                 warning: '#F59E0B',
                 danger: '#EF4444'
             };
@@ -1980,9 +2146,16 @@
             }
 
             const gaugeHTML = createCircularGauge(percentage, status);
-            const reportLink = config.type === 'report'
-                ? `<a href="https://rho.lightning.force.com/${config.reportId}" target="_blank" style="font-size: 11px; color: #00D4AA; text-decoration: none; display: block; margin-top: 4px;">View Report</a>`
-                : `<div style="font-size: 11px; color: #999; margin-top: 4px;">Calculated Metric</div>`;
+
+            // Determine subtitle based on metric type and ID
+            let reportLink;
+            if (config.type === 'report') {
+                reportLink = `<a href="https://rho.lightning.force.com/${config.reportId}" target="_blank" style="font-size: 14px; color: #00EBC0; text-decoration: none; display: block; margin-top: 4px;">View Report</a>`;
+            } else if (config.metricId === 'winRate') {
+                reportLink = `<div style="font-size: 14px; color: #999; margin-top: 4px;">Calculated Metric (Activations/New Leads)</div>`;
+            } else {
+                reportLink = `<div style="font-size: 14px; color: #999; margin-top: 4px;">Calculated Metric</div>`;
+            }
 
             // Build metric values HTML based on view mode
             let valuesHTML;
@@ -2033,6 +2206,56 @@
 
                     <div class="metric-values">
                         ${valuesHTML}
+                    </div>
+                </div>
+            `;
+        }
+
+        /**
+         * Creates the aggregate performance score card HTML
+         * @param {Object} aggregateData - {score, totalMetrics, percentage, status}
+         * @param {string} viewMode - 'standard' or 'pace'
+         * @returns {string} HTML markup for aggregate card
+         */
+        function createAggregateCard(aggregateData, viewMode) {
+            const { score, totalMetrics, percentage, status } = aggregateData;
+
+            // Determine status label based on view mode
+            const statusLabel = viewMode === 'pace'
+                ? (status === 'success' ? '✓ On Pace' : status === 'warning' ? '⚠ Below Pace' : '✗ Off Pace')
+                : (status === 'success' ? '✓ On Track' : status === 'warning' ? '⚠ At Risk' : '✗ Behind');
+
+            // Create gauge
+            const gaugeHTML = createCircularGauge(percentage, status);
+
+            // Format score display
+            const scoreDisplay = `${score.toFixed(2)} / ${totalMetrics}`;
+
+            return `
+                <div class="metric-card aggregate">
+                    <div class="metric-header">
+                        <div>
+                            <div class="metric-name">Aggregate Score</div>
+                            <div style="font-size: 16px; color: #999; margin-top: 4px;">Combined Performance Across All Metrics</div>
+                        </div>
+                        <div class="metric-status status-${status}">
+                            ${statusLabel}
+                        </div>
+                    </div>
+
+                    <div class="gauge-container aggregate-gauge">
+                        ${gaugeHTML}
+                    </div>
+
+                    <div class="metric-values">
+                        <div class="value-item">
+                            <div class="value-label">Score</div>
+                            <div class="value-number">${scoreDisplay}</div>
+                        </div>
+                        <div class="value-item">
+                            <div class="value-label">Percentage</div>
+                            <div class="value-number">${Math.round(percentage)}%</div>
+                        </div>
                     </div>
                 </div>
             `;
@@ -2100,19 +2323,39 @@
                 // Combine all values
                 Object.assign(metricValues, calculatedValues);
 
-                // Collect metrics data for insights
+                // Collect metrics data for insights and aggregate
                 const metricsForInsights = [];
 
-                // Display all metrics in order
+                // First pass: collect all metric data
                 allConfigs.forEach(config => {
                     const value = metricValues[config.metricId];
+                    const hasError = typeof value === 'object' && value.error;
+                    const actualValue = hasError ? 0 : value;
+                    const reportError = reportMetrics.find(m => m.config.metricId === config.metricId && m.error);
+                    const finalError = reportError ? reportError.error : null;
 
-                    // Check if this metric has an error
+                    if (!finalError) {
+                        const status = calculateStatus(actualValue, config.target);
+                        metricsForInsights.push({
+                            config: config,
+                            actual: actualValue,
+                            status: status
+                        });
+                    }
+                });
+
+                // Calculate and render aggregate card FIRST (if we have metrics)
+                if (metricsForInsights.length > 0) {
+                    const aggregateData = calculateAggregateScore(metricsForInsights, currentViewMode);
+                    scorecardDiv.innerHTML = createAggregateCard(aggregateData, currentViewMode);
+                }
+
+                // Second pass: render individual metric cards
+                allConfigs.forEach(config => {
+                    const value = metricValues[config.metricId];
                     const hasError = typeof value === 'object' && value.error;
                     const error = hasError ? value.error : null;
                     const actualValue = hasError ? 0 : value;
-
-                    // Find if there was a fetch error for report metrics
                     const reportError = reportMetrics.find(m => m.config.metricId === config.metricId && m.error);
                     const finalError = reportError ? reportError.error : error;
 
@@ -2126,14 +2369,6 @@
                         `;
                     } else {
                         scorecardDiv.innerHTML += createMetricCard(config, actualValue, finalError);
-
-                        // Add to insights data
-                        const status = calculateStatus(actualValue, config.target);
-                        metricsForInsights.push({
-                            config: config,
-                            actual: actualValue,
-                            status: status
-                        });
                     }
                 });
 

@@ -1244,6 +1244,12 @@
                 option.textContent = owner.Name;
                 select.appendChild(option);
             });
+
+            // Auto-select the first owner in the list
+            if (owners.length > 0) {
+                select.value = owners[0].Name;
+                loadScorecard(); // Load metrics for the first owner
+            }
         }
 
         async function fetchReportData(reportId, ownerId = null) {

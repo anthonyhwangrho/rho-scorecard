@@ -1058,7 +1058,7 @@
                 }
             } catch (error) {
                 console.error('Error fetching user info:', error);
-                showError('Connected but could not fetch user info: ' + error.message);
+                // Silently continue - user info is not critical for the app to function
                 showUserInfo();
                 // Note: loadScorecard() is called by loadOpportunityOwners() after auto-selecting first owner
             }

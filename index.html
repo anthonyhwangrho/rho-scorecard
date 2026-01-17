@@ -932,7 +932,7 @@
             if (accessToken) {
                 // Already authenticated
                 showUserInfo();
-                loadScorecard();
+                // Note: loadScorecard() is called by loadOpportunityOwners() after auto-selecting first owner
             } else {
                 // Show login button (skip setup entirely)
                 showLoginSection();
@@ -1052,7 +1052,7 @@
                     localStorage.setItem(STORAGE_KEYS.USER_INFO, JSON.stringify(userInfo));
                     showSuccess('Successfully connected to Salesforce!');
                     showUserInfo();
-                    loadScorecard();
+                    // Note: loadScorecard() is called by loadOpportunityOwners() after auto-selecting first owner
                 } else {
                     throw new Error('Failed to fetch user info');
                 }
@@ -1060,7 +1060,7 @@
                 console.error('Error fetching user info:', error);
                 showError('Connected but could not fetch user info: ' + error.message);
                 showUserInfo();
-                loadScorecard();
+                // Note: loadScorecard() is called by loadOpportunityOwners() after auto-selecting first owner
             }
         }
 

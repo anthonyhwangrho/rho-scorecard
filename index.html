@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rho Performance Scorecard</title>
+    <title>Rho Sales Rep Scorecard</title>
     <style>
         * {
             margin: 0;
@@ -35,7 +35,7 @@
 
         h1 {
             color: #0A0A0A;
-            margin-bottom: 10px;
+            margin-bottom: 0;
             font-size: 28px;
             font-weight: 600;
         }
@@ -54,7 +54,8 @@
 
         .subtitle {
             color: #777;
-            margin-bottom: 30px;
+            margin-top: 5px;
+            margin-bottom: 0;
         }
 
         .auth-section {
@@ -128,6 +129,22 @@
         }
 
         .logout-btn:hover {
+            background: #2A2A2A;
+        }
+
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .logout-btn-corner {
+            background: #0A0A0A;
+            color: white;
+        }
+
+        .logout-btn-corner:hover {
             background: #2A2A2A;
         }
 
@@ -479,6 +496,118 @@
             letter-spacing: 0.5px;
         }
 
+        .insights-card {
+            background: linear-gradient(135deg, #0A0A0A 0%, #1A1A1A 100%);
+            border: 1px solid #00D4AA;
+            border-radius: 8px;
+            padding: 24px;
+            margin-bottom: 20px;
+            color: #FFFFFF;
+        }
+
+        .insights-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+
+        .insights-icon {
+            font-size: 24px;
+        }
+
+        .insights-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #00D4AA;
+        }
+
+        .insights-summary {
+            font-size: 16px;
+            line-height: 1.6;
+            margin-bottom: 16px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #333;
+            color: #FFFFFF;
+        }
+
+        .insights-recommendations {
+            margin-top: 12px;
+        }
+
+        .insights-recommendations h4 {
+            font-size: 16px;
+            font-weight: 600;
+            color: #00D4AA;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .recommendation-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            margin-bottom: 8px;
+            padding: 8px;
+            background: rgba(0, 212, 170, 0.05);
+            border-radius: 4px;
+        }
+
+        .recommendation-icon {
+            color: #00D4AA;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .recommendation-text {
+            font-size: 14px;
+            line-height: 1.5;
+            color: #E0E0E0;
+        }
+
+        .view-toggle-group {
+            display: flex;
+            gap: 10px;
+            background: #F8F9FA;
+            padding: 4px;
+            border-radius: 8px;
+            width: fit-content;
+        }
+
+        .view-toggle-btn {
+            background: transparent;
+            color: #666;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin: 0;
+        }
+
+        .view-toggle-btn:hover {
+            background: #E5E7EB;
+            transform: none;
+        }
+
+        .view-toggle-btn.active {
+            background: #00D4AA;
+            color: white;
+        }
+
+        .pace-info {
+            margin-top: 12px;
+            padding: 12px;
+            background: #F8F9FA;
+            border-left: 3px solid #00D4AA;
+            border-radius: 4px;
+            font-size: 13px;
+            color: #666;
+        }
+
         @media (max-width: 768px) {
             .scorecard {
                 grid-template-columns: 1fr;
@@ -498,8 +627,8 @@
 </head>
 <body>
     <div class="container">
-        <div class="card">
-            <h1>Rho Performance Scorecard</h1>
+        <div id="authCard" class="card">
+            <h1>Rho Sales Rep Scorecard</h1>
             <p class="subtitle">Track your metrics against targets in real-time</p>
 
             <div id="setupSection" class="hidden">
@@ -540,27 +669,53 @@
                 </div>
             </div>
 
-            <div id="userInfoSection" class="hidden">
-                <div class="user-info">
-                    <div class="user-info-text">
-                        <strong>Connected:</strong> <span id="userName"></span> <span style="color: #666; margin: 0 8px;">•</span> <span id="orgName"></span>
-                    </div>
-                    <button class="logout-btn" onclick="logout()">Logout</button>
-                </div>
-            </div>
-
             <div id="errorMessage" class="error hidden"></div>
             <div id="successMessage" class="success hidden"></div>
         </div>
 
         <div id="scorecardSection" class="hidden">
             <div class="card">
+                <div class="header-container">
+                    <div>
+                        <h1>Rho Sales Rep Scorecard</h1>
+                        <p class="subtitle">Track your metrics against targets in real-time</p>
+                    </div>
+                    <div id="userInfoSection" class="hidden">
+                        <button class="logout-btn-corner" onclick="logout()">Logout</button>
+                    </div>
+                </div>
+
                 <div style="margin-bottom: 20px;">
                     <label for="ownerSelect" style="display: block; margin-bottom: 8px; color: #555; font-weight: 600;">Filter by Opportunity Owner:</label>
                     <select id="ownerSelect" onchange="loadScorecard()" style="padding: 10px; border: 2px solid #e0e0e0; border-radius: 6px; font-size: 14px; width: 100%; max-width: 300px; cursor: pointer;">
                         <option value="">Loading owners...</option>
                     </select>
                 </div>
+
+                <!-- View Mode Toggle -->
+                <div style="margin-bottom: 20px;">
+                    <label style="display: block; margin-bottom: 8px; color: #555; font-weight: 600;">View Mode:</label>
+                    <div class="view-toggle-group">
+                        <button id="paceViewBtn" class="view-toggle-btn active" onclick="setViewMode('pace')">
+                            ⏱️ Period Pace Adjusted
+                        </button>
+                        <button id="standardViewBtn" class="view-toggle-btn" onclick="setViewMode('standard')">
+                            📊 Standard
+                        </button>
+                    </div>
+                    <div id="paceInfo" class="pace-info hidden"></div>
+                </div>
+
+                <!-- AI Insights Section -->
+                <div id="insightsSection" class="insights-card hidden">
+                    <div class="insights-header">
+                        <span class="insights-icon">💡</span>
+                        <h3 class="insights-title">Performance Insights</h3>
+                    </div>
+                    <div id="insightsSummary" class="insights-summary"></div>
+                    <div id="insightsRecommendations" class="insights-recommendations"></div>
+                </div>
+
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
                     <h2>Performance Metrics</h2>
                     <div class="button-group">
@@ -879,9 +1034,40 @@
         // Pre-configured settings for one-click login
         // These are safe to hardcode (Consumer Key is public, not a secret)
         const PRECONFIGURED = {
-            CLIENT_ID: '3MVG9_XwsqeYoueJz1.VgYcbyC6hQIE9I8DJwaiwPCHM0rJIKMG8_PhoTzSw_YEk.2MBHfnIStQRxta_rD6pI',
+            CLIENT_ID: '3MVG9_XwsqeYoueJz1.VgYcbyC6hQlE9I8DJwaiwPCHM0rJIKMG8_PhoTzSw_YEk.2MBHfnIStQRxta_rD6pi',
             LOGIN_URL: 'http://rho.lightning.force.com/'
         };
+
+        // View mode state (default to period pace adjusted)
+        let currentViewMode = 'pace';  // 'standard' or 'pace'
+
+        /**
+         * Sets the active view mode and refreshes the scorecard
+         * @param {string} mode - 'standard' or 'pace'
+         */
+        function setViewMode(mode) {
+            currentViewMode = mode;
+
+            // Update button states
+            document.getElementById('standardViewBtn').classList.toggle('active', mode === 'standard');
+            document.getElementById('paceViewBtn').classList.toggle('active', mode === 'pace');
+
+            // Show/hide pace info
+            const paceInfoDiv = document.getElementById('paceInfo');
+            if (mode === 'pace') {
+                const monthProgress = getMonthProgress();
+                paceInfoDiv.innerHTML = `
+                    📅 Day ${monthProgress.dayOfMonth} of ${monthProgress.totalDays}
+                    (${(monthProgress.percentElapsed * 100).toFixed(0)}% of month elapsed)
+                `;
+                paceInfoDiv.classList.remove('hidden');
+            } else {
+                paceInfoDiv.classList.add('hidden');
+            }
+
+            // Reload scorecard with new view mode
+            loadScorecard();
+        }
 
         const STORAGE_KEYS = {
             ACCESS_TOKEN: 'sf_access_token',
@@ -905,6 +1091,17 @@
 
             // Validate metric configurations
             validateConfigs(metricConfigs);
+
+            // Initialize pace info display (since pace mode is default)
+            const paceInfoDiv = document.getElementById('paceInfo');
+            if (paceInfoDiv && currentViewMode === 'pace') {
+                const monthProgress = getMonthProgress();
+                paceInfoDiv.innerHTML = `
+                    📅 Day ${monthProgress.dayOfMonth} of ${monthProgress.totalDays}
+                    (${(monthProgress.percentElapsed * 100).toFixed(0)}% of month elapsed)
+                `;
+                paceInfoDiv.classList.remove('hidden');
+            }
 
             // Check if we're coming back from OAuth callback
             if (window.location.hash) {
@@ -940,6 +1137,7 @@
         }
 
         function showSetup() {
+            document.getElementById('authCard').classList.remove('hidden');
             document.getElementById('setupSection').classList.remove('hidden');
             document.getElementById('loginSection').classList.add('hidden');
             document.getElementById('userInfoSection').classList.add('hidden');
@@ -953,6 +1151,7 @@
         }
 
         function showLoginSection() {
+            document.getElementById('authCard').classList.remove('hidden');
             document.getElementById('setupSection').classList.add('hidden');
             document.getElementById('loginSection').classList.remove('hidden');
             document.getElementById('userInfoSection').classList.add('hidden');
@@ -960,14 +1159,11 @@
         }
 
         function showUserInfo() {
+            document.getElementById('authCard').classList.add('hidden');
             document.getElementById('setupSection').classList.add('hidden');
             document.getElementById('loginSection').classList.add('hidden');
             document.getElementById('userInfoSection').classList.remove('hidden');
             document.getElementById('scorecardSection').classList.remove('hidden');
-
-            const userInfo = JSON.parse(localStorage.getItem(STORAGE_KEYS.USER_INFO) || '{}');
-            document.getElementById('userName').textContent = userInfo.display_name || userInfo.username || 'User';
-            document.getElementById('orgName').textContent = userInfo.organization_name || 'Org';
 
             // Load opportunity owners for the dropdown
             loadOpportunityOwners();
@@ -1438,12 +1634,233 @@
 
         function formatNumber(num, unit) {
             if (unit === '$') {
-                return '$' + num.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+                return '$' + Math.round(num).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
             }
             if (unit === '%') {
-                return num.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 1 }) + '%';
+                return Math.round(num).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 }) + '%';
             }
-            return num.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+            return Math.round(num).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+        }
+
+        /**
+         * Gets the current day of month and total days in current month
+         * @returns {Object} {dayOfMonth, totalDays, percentElapsed, daysRemaining}
+         */
+        function getMonthProgress() {
+            const now = new Date();
+            const dayOfMonth = now.getDate();  // 1-31
+            const year = now.getFullYear();
+            const month = now.getMonth();
+
+            // Get total days in current month
+            const totalDays = new Date(year, month + 1, 0).getDate();
+
+            // Calculate percent of month elapsed
+            const percentElapsed = dayOfMonth / totalDays;
+
+            return {
+                dayOfMonth,
+                totalDays,
+                percentElapsed,
+                daysRemaining: totalDays - dayOfMonth
+            };
+        }
+
+        /**
+         * Calculates pace-adjusted target based on days elapsed
+         * @param {number} monthlyTarget - Full monthly target
+         * @param {number} percentElapsed - Fraction of month elapsed (0-1)
+         * @returns {number} Expected achievement by this point in month
+         */
+        function getPaceAdjustedTarget(monthlyTarget, percentElapsed) {
+            return monthlyTarget * percentElapsed;
+        }
+
+        /**
+         * Calculates if metric is on pace
+         * @param {number} actual - Current actual value
+         * @param {number} monthlyTarget - Full monthly target
+         * @param {number} percentElapsed - Fraction of month elapsed (0-1)
+         * @returns {string} 'success', 'warning', or 'danger'
+         */
+        function calculatePaceStatus(actual, monthlyTarget, percentElapsed) {
+            const expectedByNow = getPaceAdjustedTarget(monthlyTarget, percentElapsed);
+
+            // Handle edge case: if we're at the very start of the month
+            if (expectedByNow === 0) {
+                return 'success';  // Can't be behind if target is 0
+            }
+
+            const pacePercentage = actual / expectedByNow;
+
+            // Using same thresholds as standard view (90%/70%)
+            if (pacePercentage >= thresholds.success) return 'success';
+            if (pacePercentage >= thresholds.warning) return 'warning';
+            return 'danger';
+        }
+
+        /**
+         * Projects end-of-month achievement based on current pace
+         * @param {number} actual - Current actual value
+         * @param {number} dayOfMonth - Current day of month
+         * @param {number} totalDays - Total days in month
+         * @returns {number} Projected final achievement
+         */
+        function getProjectedFinish(actual, dayOfMonth, totalDays) {
+            if (dayOfMonth === 0) return 0;
+            const dailyPace = actual / dayOfMonth;
+            return dailyPace * totalDays;
+        }
+
+        /**
+         * Generates AI-powered insights and recommendations
+         * @param {Array} metricsData - Array of {config, actual, status}
+         * @param {string} ownerName - Name of the selected owner
+         */
+        function generateInsights(metricsData, ownerName) {
+            const insightsSection = document.getElementById('insightsSection');
+            const summaryDiv = document.getElementById('insightsSummary');
+            const recommendationsDiv = document.getElementById('insightsRecommendations');
+
+            // Recalculate metrics based on current view mode
+            let processedMetrics = metricsData;
+            const monthProgress = getMonthProgress();
+
+            if (currentViewMode === 'pace') {
+                processedMetrics = metricsData.map(metric => ({
+                    ...metric,
+                    status: calculatePaceStatus(metric.actual, metric.config.target, monthProgress.percentElapsed),
+                    paceTarget: getPaceAdjustedTarget(metric.config.target, monthProgress.percentElapsed),
+                    projected: getProjectedFinish(metric.actual, monthProgress.dayOfMonth, monthProgress.totalDays)
+                }));
+            }
+
+            // Count metrics by status
+            const statusCounts = {
+                success: processedMetrics.filter(m => m.status === 'success').length,
+                warning: processedMetrics.filter(m => m.status === 'warning').length,
+                danger: processedMetrics.filter(m => m.status === 'danger').length
+            };
+
+            const totalMetrics = processedMetrics.length;
+            const ownerText = ownerName ? ownerName : 'the team';
+            const viewText = currentViewMode === 'pace' ? 'on pace for' : 'on track for';
+
+            // Generate summary (adjust language for pace mode)
+            let summaryText = '';
+            if (statusCounts.success === totalMetrics) {
+                summaryText = `🎉 Excellent performance! ${ownerText} is ${viewText} all ${totalMetrics} metrics.`;
+            } else if (statusCounts.success >= totalMetrics * 0.75) {
+                summaryText = `✅ Strong performance overall. ${ownerText} is ${viewText} ${statusCounts.success} out of ${totalMetrics} metrics.`;
+            } else if (statusCounts.danger >= totalMetrics * 0.5) {
+                const pacePhrase = currentViewMode === 'pace' ? 'behind pace on' : 'behind target on';
+                summaryText = `⚠️ Performance needs attention. ${ownerText} is ${pacePhrase} ${statusCounts.danger} out of ${totalMetrics} metrics.`;
+            } else {
+                summaryText = `📊 Mixed performance. ${ownerText} is ${viewText} ${statusCounts.success} metrics, at risk for ${statusCounts.warning}, and behind on ${statusCounts.danger}.`;
+            }
+
+            summaryDiv.textContent = summaryText;
+
+            // Generate recommendations (adjust for pace mode)
+            const recommendations = [];
+
+            processedMetrics.forEach(metric => {
+                if (currentViewMode === 'pace') {
+                    // PACE MODE RECOMMENDATIONS
+                    const percentage = metric.paceTarget > 0 ? (metric.actual / metric.paceTarget) * 100 : 100;
+                    const dailyPaceNeeded = metric.config.target / monthProgress.totalDays;
+                    const gap = metric.paceTarget - metric.actual;
+
+                    if (metric.status === 'danger') {
+                        if (metric.actual === 0) {
+                            recommendations.push({
+                                priority: 1,
+                                text: `<strong>Urgent:</strong> ${metric.config.metricName} is at 0. Need to average ${formatNumber(dailyPaceNeeded, metric.config.unit)}/day to hit monthly target.`
+                            });
+                        } else {
+                            recommendations.push({
+                                priority: 1,
+                                text: `<strong>Behind Pace:</strong> ${metric.config.metricName} needs ${formatNumber(gap, metric.config.unit)} more to be on pace. Projected finish: ${formatNumber(metric.projected, metric.config.unit)}.`
+                            });
+                        }
+                    } else if (metric.status === 'warning') {
+                        recommendations.push({
+                            priority: 2,
+                            text: `<strong>Slipping:</strong> ${metric.config.metricName} pace is slowing. Need ${formatNumber(gap, metric.config.unit)} more to stay on track.`
+                        });
+                    } else if (metric.projected > metric.config.target * 1.1) {
+                        recommendations.push({
+                            priority: 3,
+                            text: `<strong>Ahead of pace:</strong> ${metric.config.metricName} is projected to finish at ${formatNumber(metric.projected, metric.config.unit)} - exceeding target!`
+                        });
+                    }
+                } else {
+                    // STANDARD MODE RECOMMENDATIONS (existing logic)
+                    const percentage = (metric.actual / metric.config.target) * 100;
+
+                    if (metric.status === 'danger') {
+                        if (metric.actual === 0) {
+                            recommendations.push({
+                                priority: 1,
+                                text: `<strong>Urgent:</strong> ${metric.config.metricName} is at 0. Immediate action required.`
+                            });
+                        } else {
+                            const gap = metric.config.target - metric.actual;
+                            recommendations.push({
+                                priority: 1,
+                                text: `<strong>Focus:</strong> ${metric.config.metricName} needs ${formatNumber(gap, metric.config.unit)} more to reach target. Currently at ${percentage.toFixed(0)}% of goal.`
+                            });
+                        }
+                    } else if (metric.status === 'warning') {
+                        const gap = metric.config.target - metric.actual;
+                        recommendations.push({
+                            priority: 2,
+                            text: `<strong>Monitor:</strong> ${metric.config.metricName} is at risk. Push for ${formatNumber(gap, metric.config.unit)} more to get back on track.`
+                        });
+                    }
+                }
+            });
+
+            // Find top performer
+            const topPerformer = metricsData.reduce((best, current) => {
+                const currentPct = (current.actual / current.config.target) * 100;
+                const bestPct = (best.actual / best.config.target) * 100;
+                return currentPct > bestPct ? current : best;
+            });
+
+            if (topPerformer && (topPerformer.actual / topPerformer.config.target) >= 1.2) {
+                recommendations.push({
+                    priority: 3,
+                    text: `<strong>Great work:</strong> ${topPerformer.config.metricName} is performing exceptionally at ${((topPerformer.actual / topPerformer.config.target) * 100).toFixed(0)}% of target. Keep this momentum!`
+                });
+            }
+
+            // Sort by priority (lower number = higher priority)
+            recommendations.sort((a, b) => a.priority - b.priority);
+
+            // Render recommendations
+            if (recommendations.length > 0) {
+                recommendationsDiv.innerHTML = `
+                    <h4>🎯 Recommended Actions</h4>
+                    ${recommendations.map(rec => `
+                        <div class="recommendation-item">
+                            <span class="recommendation-icon">→</span>
+                            <span class="recommendation-text">${rec.text}</span>
+                        </div>
+                    `).join('')}
+                `;
+            } else {
+                recommendationsDiv.innerHTML = `
+                    <h4>🎯 Recommended Actions</h4>
+                    <div class="recommendation-item">
+                        <span class="recommendation-icon">✓</span>
+                        <span class="recommendation-text"><strong>Maintain course:</strong> All metrics are performing well. Continue current strategies.</span>
+                    </div>
+                `;
+            }
+
+            // Show the insights section
+            insightsSection.classList.remove('hidden');
         }
 
         /**
@@ -1541,16 +1958,62 @@
         }
 
         function createMetricCard(config, actual, error = null) {
-            const percentage = (actual / config.target) * 100;
-            const status = calculateStatus(actual, config.target);
+            let percentage, status, displayTarget, statusLabel;
+            const monthProgress = getMonthProgress();
 
-            // Only show report link for report-based metrics
+            if (currentViewMode === 'pace') {
+                // PACE-ADJUSTED VIEW
+                const paceTarget = getPaceAdjustedTarget(config.target, monthProgress.percentElapsed);
+                const projected = getProjectedFinish(actual, monthProgress.dayOfMonth, monthProgress.totalDays);
+
+                percentage = paceTarget > 0 ? (actual / paceTarget) * 100 : 100;
+                status = calculatePaceStatus(actual, config.target, monthProgress.percentElapsed);
+                displayTarget = paceTarget;
+                statusLabel = status === 'success' ? '✓ On Pace' : status === 'warning' ? '⚠ Below Pace' : '✗ Off Pace';
+
+            } else {
+                // STANDARD VIEW
+                percentage = (actual / config.target) * 100;
+                status = calculateStatus(actual, config.target);
+                displayTarget = config.target;
+                statusLabel = status === 'success' ? '✓ On Track' : status === 'warning' ? '⚠ At Risk' : '✗ Behind';
+            }
+
+            const gaugeHTML = createCircularGauge(percentage, status);
             const reportLink = config.type === 'report'
                 ? `<a href="https://rho.lightning.force.com/${config.reportId}" target="_blank" style="font-size: 11px; color: #00D4AA; text-decoration: none; display: block; margin-top: 4px;">View Report</a>`
                 : `<div style="font-size: 11px; color: #999; margin-top: 4px;">Calculated Metric</div>`;
 
-            // Create the circular gauge
-            const gaugeHTML = createCircularGauge(percentage, status);
+            // Build metric values HTML based on view mode
+            let valuesHTML;
+            if (currentViewMode === 'pace') {
+                const projected = getProjectedFinish(actual, monthProgress.dayOfMonth, monthProgress.totalDays);
+                valuesHTML = `
+                    <div class="value-item">
+                        <div class="value-label">Current</div>
+                        <div class="value-number">${formatNumber(actual, config.unit)}</div>
+                    </div>
+                    <div class="value-item">
+                        <div class="value-label">Expected</div>
+                        <div class="value-number">${formatNumber(displayTarget, config.unit)}</div>
+                    </div>
+                    <div class="value-item">
+                        <div class="value-label">Projected</div>
+                        <div class="value-number">${formatNumber(projected, config.unit)}</div>
+                    </div>
+                `;
+            } else {
+                valuesHTML = `
+                    <div class="value-item">
+                        <div class="value-label">Current</div>
+                        <div class="value-number">${formatNumber(actual, config.unit)}</div>
+                    </div>
+                    <div class="value-item">
+                        <div class="value-label">Target</div>
+                        <div class="value-number">${formatNumber(displayTarget, config.unit)}</div>
+                    </div>
+                `;
+            }
 
             return `
                 <div class="metric-card">
@@ -1560,25 +2023,16 @@
                             ${reportLink}
                         </div>
                         <div class="metric-status status-${status}">
-                            ${status === 'success' ? '✓ On Track' : status === 'warning' ? '⚠ At Risk' : '✗ Behind'}
+                            ${statusLabel}
                         </div>
                     </div>
 
-                    <!-- Circular Gauge -->
                     <div class="gauge-container">
                         ${gaugeHTML}
                     </div>
 
-                    <!-- Metric Values -->
                     <div class="metric-values">
-                        <div class="value-item">
-                            <div class="value-label">Current</div>
-                            <div class="value-number">${formatNumber(actual, config.unit)}</div>
-                        </div>
-                        <div class="value-item">
-                            <div class="value-label">Target</div>
-                            <div class="value-number">${formatNumber(config.target, config.unit)}</div>
-                        </div>
+                        ${valuesHTML}
                     </div>
                 </div>
             `;
@@ -1646,6 +2100,9 @@
                 // Combine all values
                 Object.assign(metricValues, calculatedValues);
 
+                // Collect metrics data for insights
+                const metricsForInsights = [];
+
                 // Display all metrics in order
                 allConfigs.forEach(config => {
                     const value = metricValues[config.metricId];
@@ -1669,8 +2126,21 @@
                         `;
                     } else {
                         scorecardDiv.innerHTML += createMetricCard(config, actualValue, finalError);
+
+                        // Add to insights data
+                        const status = calculateStatus(actualValue, config.target);
+                        metricsForInsights.push({
+                            config: config,
+                            actual: actualValue,
+                            status: status
+                        });
                     }
                 });
+
+                // Generate AI insights
+                if (metricsForInsights.length > 0) {
+                    generateInsights(metricsForInsights, selectedOwnerId);
+                }
 
             } catch (error) {
                 console.error('Error loading scorecard:', error);

@@ -584,7 +584,7 @@
         }
 
         .insights-card {
-            background: linear-gradient(135deg, #0A0A0A 0%, #1A1A1A 100%);
+            background: #1A1A1A;
             border: 1px solid #00EBC0;
             border-radius: 8px;
             padding: 24px;
@@ -610,6 +610,9 @@
         }
 
         .insights-summary {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
             font-size: 16px;
             line-height: 1.6;
             margin-bottom: 16px;
@@ -623,21 +626,18 @@
         }
 
         .insights-recommendations h4 {
-            font-size: 16px;
+            font-size: 18px;
             font-weight: 600;
             color: #00EBC0;
-            margin-bottom: 12px;
-            letter-spacing: 1px;
+            margin-bottom: 16px;
         }
 
         .recommendation-item {
             display: flex;
             align-items: flex-start;
             gap: 10px;
-            margin-bottom: 8px;
-            padding: 8px;
-            background: rgba(0, 235, 192, 0.05);
-            border-radius: 4px;
+            margin-bottom: 12px;
+            padding: 0;
         }
 
         .recommendation-icon {
@@ -691,6 +691,105 @@
             border-left: 3px solid #00EBC0;
             border-radius: 4px;
             font-size: 13px;
+            color: #666;
+        }
+
+        /* GP Attainment Table Styles */
+        .gp-attainment-card {
+            background: #FFFFFF;
+            border: 1px solid #E5E7EB;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px -1px rgba(10, 10, 10, 0.08);
+        }
+
+        .gp-attainment-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .gp-attainment-icon {
+            font-size: 24px;
+        }
+
+        .gp-attainment-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #0A0A0A;
+        }
+
+        .gp-attainment-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 16px;
+            table-layout: fixed;
+        }
+
+        .gp-attainment-table th,
+        .gp-attainment-table td {
+            padding: 12px 16px;
+        }
+
+        .gp-attainment-table th:nth-child(1),
+        .gp-attainment-table td:nth-child(1) { width: 17.5%; }
+
+        .gp-attainment-table th:nth-child(n+2),
+        .gp-attainment-table td:nth-child(n+2) { width: 13.75%; }
+
+        .gp-attainment-table th {
+            text-align: left;
+            background: #F8F9FA;
+            border-bottom: 2px solid #E5E7EB;
+            font-weight: 600;
+            color: #555;
+        }
+
+        .gp-attainment-table th:not(:first-child) {
+            text-align: right;
+        }
+
+        .gp-attainment-table td {
+            border-bottom: 1px solid #E5E7EB;
+        }
+
+        .gp-attainment-table td:not(:first-child) {
+            text-align: right;
+        }
+
+        .gp-attainment-table tr:hover {
+            background: #F8F9FA;
+        }
+
+        .gp-attainment-table .rep-name {
+            font-weight: 500;
+            color: #0A0A0A;
+        }
+
+        .gp-attainment-table .currency {
+            color: #0A0A0A;
+        }
+
+        .gp-attainment-table .percent-good {
+            color: #10B981;
+            font-weight: 600;
+        }
+
+        .gp-attainment-table .percent-warning {
+            color: #F59E0B;
+            font-weight: 600;
+        }
+
+        .gp-attainment-table .percent-danger {
+            color: #EF4444;
+            font-weight: 600;
+        }
+
+        .gp-attainment-loading {
+            text-align: center;
+            padding: 40px;
             color: #666;
         }
 
@@ -789,10 +888,24 @@
                 </div>
 
                 <div style="margin-bottom: 20px;">
-                    <label for="ownerSelect" style="display: block; margin-bottom: 8px; color: #555; font-weight: 600;">Filter by Opportunity Owner:</label>
+                    <label for="ownerSelect" style="display: block; margin-bottom: 8px; color: #555; font-weight: 600;">Filter By Sales Rep:</label>
                     <select id="ownerSelect" onchange="loadScorecard()" style="padding: 10px; border: 2px solid #e0e0e0; border-radius: 6px; font-size: 14px; width: 100%; max-width: 300px; cursor: pointer;">
                         <option value="">Loading owners...</option>
                     </select>
+                </div>
+
+                <!-- GP Attainment Section -->
+                <div id="gpAttainmentSection" class="gp-attainment-card hidden">
+                    <div class="gp-attainment-header">
+                        <div>
+                            <h3 class="gp-attainment-title">Quarterly GP Attainment</h3>
+                            <a id="gpAttainmentReportLink" href="https://rho.lightning.force.com/00OTP0000028AU52AM" target="_blank" style="font-size: 14px; color: #00EBC0; text-decoration: none;">View Report</a>
+                        </div>
+                        <button class="config-btn" onclick="showAcceleratorSettings()" style="margin-left: auto;">Edit Accelerators</button>
+                    </div>
+                    <div id="gpAttainmentContent">
+                        <div class="gp-attainment-loading">Loading GP Attainment data...</div>
+                    </div>
                 </div>
 
                 <!-- View Mode Toggle -->
@@ -812,7 +925,6 @@
                 <!-- AI Insights Section -->
                 <div id="insightsSection" class="insights-card hidden">
                     <div class="insights-header">
-                        <span class="insights-icon">💡</span>
                         <h3 class="insights-title">Performance Insights</h3>
                     </div>
                     <div id="insightsSummary" class="insights-summary"></div>
@@ -839,6 +951,54 @@
                 <div id="targetInputs" style="max-width: 500px;"></div>
                 <div style="margin-top: 30px;">
                     <button class="refresh-btn" onclick="saveTargets()" style="padding: 14px 32px; font-size: 16px;">Save Targets</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="editAcceleratorSection" class="hidden">
+            <div class="card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h2>Edit Accelerators</h2>
+                    <button class="config-btn" onclick="showScorecard()">Back to Scorecard</button>
+                </div>
+
+                <!-- Payout Percentage Section -->
+                <div style="margin-bottom: 40px;">
+                    <h3 style="font-size: 18px; font-weight: 600; color: #0A0A0A; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid #e0e0e0;">Payout Percentage</h3>
+                    <div id="payoutInputs" style="max-width: 500px;">
+                        <div class="form-group" style="margin-bottom: 20px;">
+                            <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #333;">Accelerator Floor (%)</label>
+                            <input type="number" id="accelFloor" style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 6px; font-size: 16px;" min="0" max="200" step="1">
+                            <small style="display: block; margin-top: 4px; color: #666;">% To Quota threshold where accelerator kicks in</small>
+                        </div>
+                        <div class="form-group" style="margin-bottom: 20px;">
+                            <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #333;">Multiplier</label>
+                            <input type="number" id="accelMultiplier" style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 6px; font-size: 16px;" min="1" max="5" step="0.05">
+                            <small style="display: block; margin-top: 4px; color: #666;">Multiplier applied to amounts above floor (e.g., 1.25 = 125%)</small>
+                        </div>
+                        <div class="form-group" style="margin-bottom: 20px;">
+                            <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #333;">Minimum Payout Threshold (%)</label>
+                            <input type="number" id="accelMinimum" style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 6px; font-size: 16px;" min="0" max="100" step="1">
+                            <small style="display: block; margin-top: 4px; color: #666;">Below this % To Quota, payout is 0%</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Large Logo Multiplier Section -->
+                <div style="margin-bottom: 30px;">
+                    <h3 style="font-size: 18px; font-weight: 600; color: #0A0A0A; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid #e0e0e0;">Large Logo Multiplier</h3>
+                    <div id="logoBandsInputs" style="max-width: 600px;">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+                            <label style="font-weight: 600; color: #333;">Min Logos</label>
+                            <label style="font-weight: 600; color: #333;">Max Logos</label>
+                            <label style="font-weight: 600; color: #333;">Multiplier</label>
+                        </div>
+                        <div id="logoBandRows"></div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 30px;">
+                    <button class="refresh-btn" onclick="saveAcceleratorSettingsAndReturn()" style="padding: 14px 32px; font-size: 16px;">Save Settings</button>
                 </div>
             </div>
         </div>
@@ -1177,8 +1337,134 @@
             INSTANCE_URL: 'sf_instance_url',
             CLIENT_ID: 'sf_client_id',
             LOGIN_URL: 'sf_login_url',
-            USER_INFO: 'sf_user_info'
+            USER_INFO: 'sf_user_info',
+            ACCELERATOR_SETTINGS: 'accelerator_settings'
         };
+
+        // ==========================================
+        // ACCELERATOR SETTINGS
+        // ==========================================
+        const DEFAULT_ACCELERATOR_SETTINGS = {
+            // Payout Percentage settings
+            floor: 120,           // Accelerator floor (%)
+            multiplier: 1.25,     // Multiplier for amounts above floor
+            minimum: 50,          // Minimum % to quota for any payout
+            // Large Logo Multiplier bands
+            logoBands: [
+                { min: 0, max: 7, multiplier: 0.5 },
+                { min: 8, max: 11, multiplier: 0.85 },
+                { min: 12, max: 18, multiplier: 1.0 },
+                { min: 19, max: 999, multiplier: 1.1 }
+            ]
+        };
+
+        function getAcceleratorSettings() {
+            const saved = localStorage.getItem(STORAGE_KEYS.ACCELERATOR_SETTINGS);
+            if (saved) {
+                try {
+                    const parsed = JSON.parse(saved);
+                    return {
+                        ...DEFAULT_ACCELERATOR_SETTINGS,
+                        ...parsed,
+                        logoBands: parsed.logoBands || DEFAULT_ACCELERATOR_SETTINGS.logoBands
+                    };
+                } catch (e) {
+                    console.error('Error loading accelerator settings:', e);
+                }
+            }
+            return { ...DEFAULT_ACCELERATOR_SETTINGS };
+        }
+
+        function saveAcceleratorSettings(settings) {
+            localStorage.setItem(STORAGE_KEYS.ACCELERATOR_SETTINGS, JSON.stringify(settings));
+        }
+
+        function calculatePayout(percentToQuota) {
+            const settings = getAcceleratorSettings();
+            const { floor, multiplier, minimum } = settings;
+
+            // Below minimum: no payout
+            if (percentToQuota < minimum) {
+                return 0;
+            }
+
+            // Between minimum and floor: linear payout
+            if (percentToQuota < floor) {
+                return percentToQuota;
+            }
+
+            // Above floor: accelerated payout
+            const baseAmount = floor;
+            const excessAmount = percentToQuota - floor;
+            const acceleratedExcess = excessAmount * multiplier;
+            return baseAmount + acceleratedExcess;
+        }
+
+        function calculateLargeLogoMultiplier(largeLogos) {
+            const settings = getAcceleratorSettings();
+            const { logoBands } = settings;
+
+            for (const band of logoBands) {
+                if (largeLogos >= band.min && largeLogos <= band.max) {
+                    return band.multiplier;
+                }
+            }
+            // Default to last band if above all
+            return logoBands[logoBands.length - 1].multiplier;
+        }
+
+        function showAcceleratorSettings() {
+            const settings = getAcceleratorSettings();
+
+            // Populate the payout fields
+            document.getElementById('accelFloor').value = settings.floor;
+            document.getElementById('accelMultiplier').value = settings.multiplier;
+            document.getElementById('accelMinimum').value = settings.minimum;
+
+            // Populate the logo bands
+            const logoBandRows = document.getElementById('logoBandRows');
+            logoBandRows.innerHTML = settings.logoBands.map((band, index) => `
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+                    <input type="number" id="bandMin${index}" value="${band.min}" style="padding: 10px; border: 2px solid #e0e0e0; border-radius: 6px; font-size: 14px;" min="0">
+                    <input type="number" id="bandMax${index}" value="${band.max}" style="padding: 10px; border: 2px solid #e0e0e0; border-radius: 6px; font-size: 14px;" min="0">
+                    <input type="number" id="bandMult${index}" value="${band.multiplier}" step="0.05" style="padding: 10px; border: 2px solid #e0e0e0; border-radius: 6px; font-size: 14px;" min="0">
+                </div>
+            `).join('');
+
+            // Show accelerator section, hide others
+            document.getElementById('scorecardSection').classList.add('hidden');
+            document.getElementById('editTargetsSection').classList.add('hidden');
+            document.getElementById('editAcceleratorSection').classList.remove('hidden');
+        }
+
+        function saveAcceleratorSettingsAndReturn() {
+            const currentSettings = getAcceleratorSettings();
+
+            // Collect logo bands from inputs
+            const logoBands = [];
+            for (let i = 0; i < currentSettings.logoBands.length; i++) {
+                const minEl = document.getElementById(`bandMin${i}`);
+                const maxEl = document.getElementById(`bandMax${i}`);
+                const multEl = document.getElementById(`bandMult${i}`);
+                if (minEl && maxEl && multEl) {
+                    logoBands.push({
+                        min: parseInt(minEl.value) || 0,
+                        max: parseInt(maxEl.value) || 999,
+                        multiplier: parseFloat(multEl.value) || 1.0
+                    });
+                }
+            }
+
+            const settings = {
+                floor: parseFloat(document.getElementById('accelFloor').value) || 120,
+                multiplier: parseFloat(document.getElementById('accelMultiplier').value) || 1.25,
+                minimum: parseFloat(document.getElementById('accelMinimum').value) || 50,
+                logoBands: logoBands.length > 0 ? logoBands : currentSettings.logoBands
+            };
+            saveAcceleratorSettings(settings);
+            showScorecard();
+            loadGPAttainmentTable(); // Refresh the table
+        }
 
         // Get the current page URL for the callback
         const redirectUri = window.location.href.split('#')[0].split('?')[0];
@@ -1481,8 +1767,9 @@
         }
 
         function showScorecard() {
-            // Hide edit targets section
+            // Hide edit sections
             document.getElementById('editTargetsSection').classList.add('hidden');
+            document.getElementById('editAcceleratorSection').classList.add('hidden');
 
             // Show scorecard section
             document.getElementById('scorecardSection').classList.remove('hidden');
@@ -1616,6 +1903,226 @@
             }
 
             return await response.json();
+        }
+
+        // GP Attainment Report Configuration
+        const GP_ATTAINMENT_REPORT_ID = '00OTP0000028AU52AM';
+
+        // Fetch GP Attainment report with all groupings (uses POST to get full data)
+        async function fetchGPAttainmentReport() {
+            const accessToken = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
+            const instanceUrl = localStorage.getItem(STORAGE_KEYS.INSTANCE_URL);
+
+            // Use POST with reportMetadata to get all groupings
+            const url = `${instanceUrl}/services/data/v59.0/analytics/reports/${GP_ATTAINMENT_REPORT_ID}?includeDetails=false`;
+
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${accessToken}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    reportMetadata: {
+                        // Request more groupings by setting a high standard date filter
+                        reportFormat: 'SUMMARY'
+                    }
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error(`Failed to fetch GP Attainment report: ${response.status}`);
+            }
+
+            return await response.json();
+        }
+
+        async function loadGPAttainmentTable() {
+            const section = document.getElementById('gpAttainmentSection');
+            const content = document.getElementById('gpAttainmentContent');
+
+            // Get selected owner from dropdown
+            const ownerSelect = document.getElementById('ownerSelect');
+            const selectedOwnerId = ownerSelect ? ownerSelect.value : null;
+
+            try {
+                const reportData = await fetchGPAttainmentReport();
+                console.log('GP Attainment report data:', reportData);
+
+                // Extract column information
+                const columns = reportData.reportMetadata.detailColumns;
+                const columnInfo = reportData.reportExtendedMetadata.detailColumnInfo;
+                const groupingsDown = reportData.groupingsDown;
+
+                console.log('Columns:', columns);
+                console.log('Column Info:', columnInfo);
+                console.log('Groupings:', groupingsDown);
+                console.log('Selected owner filter:', selectedOwnerId || 'All');
+
+                // Build table data from groupings (summary report grouped by Account Owner)
+                const tableData = [];
+
+                if (groupingsDown && groupingsDown.groupings) {
+                    for (const grouping of groupingsDown.groupings) {
+                        const ownerName = grouping.label;
+
+                        // Filter by selected owner if one is selected (case-insensitive, trim whitespace)
+                        if (selectedOwnerId) {
+                            const normalizedOwner = ownerName.trim().toLowerCase();
+                            const normalizedSelected = selectedOwnerId.trim().toLowerCase();
+                            if (normalizedOwner !== normalizedSelected) {
+                                continue;
+                            }
+                        }
+
+                        const factKey = grouping.key + '!T';
+                        const factData = reportData.factMap[factKey];
+
+                        if (factData && factData.aggregates) {
+                            const aggregates = factData.aggregates;
+                            // Based on the report columns:
+                            // Sum of Estimated GP Attainment, Sum of Q1 '26 Quota, Sum of Large Logos, Record Count, Percent to Quota
+                            // The order depends on the report configuration
+
+                            // Find the indices for each column we need
+                            const aggLabels = reportData.reportMetadata.aggregates || [];
+                            console.log('Aggregate labels for', ownerName, ':', aggLabels);
+                            console.log('Aggregates:', aggregates);
+
+                            // Use positional indexing based on report column order:
+                            // 0: Sum of Estimated GP Attainment
+                            // 1: Sum of Q1 '26 Quota
+                            // 2: Sum of Large Logos
+                            // 3: Record Count
+                            const gpAttainment = aggregates[0]?.value || 0;
+                            const quota = aggregates[1]?.value || 0;
+                            const largeLogos = aggregates[2]?.value || 0;
+                            // Calculate % To Quota from GP Attainment and Quota
+                            const percentToQuota = quota > 0 ? (gpAttainment / quota) * 100 : 0;
+
+                            console.log(`${ownerName}: GP=${gpAttainment}, Quota=${quota}, Large Logos=${largeLogos}, %=${percentToQuota.toFixed(2)}`);
+
+                            tableData.push({
+                                name: ownerName,
+                                gpAttainment: gpAttainment,
+                                quota: quota,
+                                largeLogos: largeLogos,
+                                percentToQuota: percentToQuota
+                            });
+                        }
+                    }
+                }
+
+                // Sort by percent to quota descending
+                tableData.sort((a, b) => b.percentToQuota - a.percentToQuota);
+
+                // Get quarter progress for projections
+                const quarterProgress = getQuarterProgress();
+                const percentElapsed = quarterProgress.percentElapsed;
+
+                // Calculate projections, payouts, and logo multipliers for each rep
+                tableData.forEach(row => {
+                    // Project to end of quarter: current / percentElapsed
+                    row.projectedGP = percentElapsed > 0 ? row.gpAttainment / percentElapsed : 0;
+                    row.projectedLargeLogos = percentElapsed > 0 ? row.largeLogos / percentElapsed : 0;
+                    row.projectedPercentToQuota = row.quota > 0 ? (row.projectedGP / row.quota) * 100 : 0;
+                    // Calculate payouts using accelerator
+                    row.payout = calculatePayout(row.percentToQuota);
+                    row.projectedPayout = calculatePayout(row.projectedPercentToQuota);
+                    // Calculate large logo multipliers
+                    row.logoMultiplier = calculateLargeLogoMultiplier(row.largeLogos);
+                    row.projectedLogoMultiplier = calculateLargeLogoMultiplier(Math.round(row.projectedLargeLogos));
+                });
+
+                // Render current actuals table
+                const currentTableHTML = `
+                    <h4 style="color: #0A0A0A; margin-bottom: 12px; font-size: 18px; font-weight: 600;">Current Actuals</h4>
+                    <table class="gp-attainment-table">
+                        <thead>
+                            <tr>
+                                <th>Rep Name</th>
+                                <th>Est. GP Attainment</th>
+                                <th>Quota</th>
+                                <th>% To Quota</th>
+                                <th>Payout %</th>
+                                <th>Large Logos</th>
+                                <th>Large Logo<br>Multiplier</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${tableData.map(row => {
+                                const percentClass = row.percentToQuota >= 100 ? 'percent-good' :
+                                                     row.percentToQuota >= 50 ? 'percent-warning' : 'percent-danger';
+                                const payoutClass = row.payout >= 120 ? 'percent-good' :
+                                                    row.payout >= 50 ? 'percent-warning' : 'percent-danger';
+                                const logoMultClass = row.logoMultiplier >= 1.0 ? 'percent-good' :
+                                                      row.logoMultiplier >= 0.85 ? 'percent-warning' : 'percent-danger';
+                                return `
+                                    <tr>
+                                        <td class="rep-name">${row.name}</td>
+                                        <td class="currency">$${row.gpAttainment.toLocaleString('en-US', {minimumFractionDigits: 0, maximumFractionDigits: 0})}</td>
+                                        <td class="currency">$${row.quota.toLocaleString('en-US', {minimumFractionDigits: 0, maximumFractionDigits: 0})}</td>
+                                        <td class="${percentClass}">${Math.round(row.percentToQuota)}%</td>
+                                        <td class="${payoutClass}">${Math.round(row.payout)}%</td>
+                                        <td>${row.largeLogos}</td>
+                                        <td class="${logoMultClass}">${row.logoMultiplier}x</td>
+                                    </tr>
+                                `;
+                            }).join('')}
+                        </tbody>
+                    </table>
+                `;
+
+                // Sort by projected percent to quota for projections table
+                const projectedData = [...tableData].sort((a, b) => b.projectedPercentToQuota - a.projectedPercentToQuota);
+
+                // Render projected table
+                const projectedTableHTML = `
+                    <h4 style="color: #0A0A0A; margin: 24px 0 12px 0; font-size: 18px; font-weight: 600;">Projected End of Q${quarterProgress.quarter} (${Math.round(percentElapsed * 100)}% of Quarter Elapsed)</h4>
+                    <table class="gp-attainment-table">
+                        <thead>
+                            <tr>
+                                <th>Rep Name</th>
+                                <th>Projected GP</th>
+                                <th>Quota</th>
+                                <th>Projected % To Quota</th>
+                                <th>Projected Payout %</th>
+                                <th>Projected Large Logos</th>
+                                <th>Projected Logo<br>Multiplier</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${projectedData.map(row => {
+                                const percentClass = row.projectedPercentToQuota >= 100 ? 'percent-good' :
+                                                     row.projectedPercentToQuota >= 75 ? 'percent-warning' : 'percent-danger';
+                                const payoutClass = row.projectedPayout >= 120 ? 'percent-good' :
+                                                    row.projectedPayout >= 50 ? 'percent-warning' : 'percent-danger';
+                                const logoMultClass = row.projectedLogoMultiplier >= 1.0 ? 'percent-good' :
+                                                      row.projectedLogoMultiplier >= 0.85 ? 'percent-warning' : 'percent-danger';
+                                return `
+                                    <tr>
+                                        <td class="rep-name">${row.name}</td>
+                                        <td class="currency">$${Math.round(row.projectedGP).toLocaleString('en-US', {minimumFractionDigits: 0, maximumFractionDigits: 0})}</td>
+                                        <td class="currency">$${row.quota.toLocaleString('en-US', {minimumFractionDigits: 0, maximumFractionDigits: 0})}</td>
+                                        <td class="${percentClass}">${Math.round(row.projectedPercentToQuota)}%</td>
+                                        <td class="${payoutClass}">${Math.round(row.projectedPayout)}%</td>
+                                        <td>${Math.round(row.projectedLargeLogos)}</td>
+                                        <td class="${logoMultClass}">${row.projectedLogoMultiplier}x</td>
+                                    </tr>
+                                `;
+                            }).join('')}
+                        </tbody>
+                    </table>
+                `;
+
+                content.innerHTML = currentTableHTML + projectedTableHTML;
+                section.classList.remove('hidden');
+
+            } catch (error) {
+                console.error('Error loading GP Attainment table:', error);
+                content.innerHTML = `<div class="gp-attainment-loading" style="color: #EF4444;">Error loading GP Attainment data: ${error.message}</div>`;
+                section.classList.remove('hidden');
+            }
         }
 
         function extractMetricValue(reportData, config, ownerId = null) {
@@ -1791,6 +2298,41 @@
         }
 
         /**
+         * Calculates progress through the current quarter
+         * @returns {Object} Quarter progress data
+         */
+        function getQuarterProgress() {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = now.getMonth(); // 0-11
+
+            // Determine current quarter and its start/end months
+            const quarter = Math.floor(month / 3) + 1; // 1-4
+            const quarterStartMonth = (quarter - 1) * 3; // 0, 3, 6, or 9
+            const quarterEndMonth = quarterStartMonth + 2; // 2, 5, 8, or 11
+
+            // Get first day of quarter and last day of quarter
+            const quarterStart = new Date(year, quarterStartMonth, 1);
+            const quarterEnd = new Date(year, quarterEndMonth + 1, 0); // Last day of quarter
+
+            // Calculate total days in quarter and days elapsed
+            const totalDays = Math.ceil((quarterEnd - quarterStart) / (1000 * 60 * 60 * 24)) + 1;
+            const daysElapsed = Math.ceil((now - quarterStart) / (1000 * 60 * 60 * 24)) + 1;
+
+            // Calculate percent elapsed
+            const percentElapsed = Math.min(daysElapsed / totalDays, 1);
+
+            return {
+                quarter,
+                year,
+                daysElapsed,
+                totalDays,
+                percentElapsed,
+                daysRemaining: totalDays - daysElapsed
+            };
+        }
+
+        /**
          * Calculates pace-adjusted target based on days elapsed
          * @param {number} monthlyTarget - Full monthly target
          * @param {number} percentElapsed - Fraction of month elapsed (0-1)
@@ -1915,17 +2457,17 @@
             // Generate summary (adjust language for pace mode)
             let summaryText = '';
             if (statusCounts.success === totalMetrics) {
-                summaryText = `🎉 Excellent performance! ${ownerText} is ${viewText} all ${totalMetrics} metrics.`;
+                summaryText = `<span class="recommendation-icon">→</span><span class="recommendation-text">Excellent performance! ${ownerText} is ${viewText} all ${totalMetrics} metrics.</span>`;
             } else if (statusCounts.success >= totalMetrics * 0.75) {
-                summaryText = `✅ Strong performance overall. ${ownerText} is ${viewText} ${statusCounts.success} out of ${totalMetrics} metrics.`;
+                summaryText = `<span class="recommendation-icon">→</span><span class="recommendation-text">Strong performance overall. ${ownerText} is ${viewText} ${statusCounts.success} out of ${totalMetrics} metrics.</span>`;
             } else if (statusCounts.danger >= totalMetrics * 0.5) {
                 const pacePhrase = currentViewMode === 'pace' ? 'behind pace on' : 'behind target on';
-                summaryText = `⚠️ Performance needs attention. ${ownerText} is ${pacePhrase} ${statusCounts.danger} out of ${totalMetrics} metrics.`;
+                summaryText = `<span class="recommendation-icon">→</span><span class="recommendation-text">Performance needs attention. ${ownerText} is ${pacePhrase} ${statusCounts.danger} out of ${totalMetrics} metrics.</span>`;
             } else {
-                summaryText = `📊 Mixed performance. ${ownerText} is ${viewText} ${statusCounts.success} metrics, at risk for ${statusCounts.warning}, and behind on ${statusCounts.danger}.`;
+                summaryText = `<span class="recommendation-icon">→</span><span class="recommendation-text">Mixed performance. ${ownerText} is ${viewText} ${statusCounts.success} metrics, at risk for ${statusCounts.warning}, and behind on ${statusCounts.danger}.</span>`;
             }
 
-            summaryDiv.textContent = summaryText;
+            summaryDiv.innerHTML = summaryText;
 
             // Generate recommendations (adjust for pace mode)
             const recommendations = [];
@@ -2007,7 +2549,7 @@
             // Render recommendations
             if (recommendations.length > 0) {
                 recommendationsDiv.innerHTML = `
-                    <h4>🎯 Recommended Actions</h4>
+                    <h4>Recommended Actions</h4>
                     ${recommendations.map(rec => `
                         <div class="recommendation-item">
                             <span class="recommendation-icon">→</span>
@@ -2017,7 +2559,7 @@
                 `;
             } else {
                 recommendationsDiv.innerHTML = `
-                    <h4>🎯 Recommended Actions</h4>
+                    <h4>Recommended Actions</h4>
                     <div class="recommendation-item">
                         <span class="recommendation-icon">✓</span>
                         <span class="recommendation-text"><strong>Maintain course:</strong> All metrics are performing well. Continue current strategies.</span>
@@ -2270,6 +2812,9 @@
             }
 
             document.getElementById('loading').classList.remove('hidden');
+
+            // Load GP Attainment table in parallel with other data
+            loadGPAttainmentTable();
 
             try {
                 const scorecardDiv = document.getElementById('scorecard');

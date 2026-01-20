@@ -908,20 +908,6 @@
                     </div>
                 </div>
 
-                <!-- View Mode Toggle -->
-                <div style="margin-bottom: 20px;">
-                    <label style="display: block; margin-bottom: 8px; color: #555; font-weight: 600;">View Mode:</label>
-                    <div class="view-toggle-group">
-                        <button id="paceViewBtn" class="view-toggle-btn active" onclick="setViewMode('pace')">
-                            ⏱️ Period Pace Adjusted
-                        </button>
-                        <button id="standardViewBtn" class="view-toggle-btn" onclick="setViewMode('standard')">
-                            📊 Standard
-                        </button>
-                    </div>
-                    <div id="paceInfo" class="pace-info hidden"></div>
-                </div>
-
                 <!-- AI Insights Section -->
                 <div id="insightsSection" class="insights-card hidden">
                     <div class="insights-header">
@@ -1064,19 +1050,35 @@
                 aggregationField: 'ID',
                 aggregationType: 'count'
             },
-            // Calculated metrics
             {
-                type: 'calculated',
-                metricId: 'winRate',
-                metricName: 'Win Rate',
-                formula: {
-                    operation: 'divide',
-                    numerator: 'activations',      // metricId of activations metric
-                    denominator: 'newLeads',        // metricId of new leads metric
-                    multiplyBy: 100                 // Convert to percentage
-                },
+                type: 'report',
+                metricId: 'sqlActivatedPercent',
+                reportId: '00OTP000002j7iX2AQ',
+                metricName: 'SQL - Activated %',
                 target: 100,
-                unit: '%'
+                unit: '%',
+                aggregationField: 'Conversion %',
+                aggregationType: 'formula'
+            },
+            {
+                type: 'report',
+                metricId: 'avgTotalBalanceVCICP',
+                reportId: '00OTP000008orXZ2AY',
+                metricName: 'Avg. Total Balance VC ICP - This Month',
+                target: 750000,
+                unit: '$',
+                aggregationField: 'Avg. Total Balance',
+                aggregationType: 'formula_currency'
+            },
+            {
+                type: 'report',
+                metricId: 'currentDepositsWon',
+                reportId: '00OTP0000029F0H2AU',
+                metricName: 'Current Deposits Won - This Month',
+                target: 10000000,
+                unit: '$',
+                aggregationField: 'Current Deposits Won',
+                aggregationType: 'formula_currency'
             }
         ];
 
@@ -1302,7 +1304,7 @@
         };
 
         // View mode state (default to period pace adjusted)
-        let currentViewMode = 'pace';  // 'standard' or 'pace'
+        let currentViewMode = 'standard';  // 'standard' or 'pace'
 
         /**
          * Sets the active view mode and refreshes the scorecard
@@ -1480,17 +1482,6 @@
 
             // Validate metric configurations
             validateConfigs(metricConfigs);
-
-            // Initialize pace info display (since pace mode is default)
-            const paceInfoDiv = document.getElementById('paceInfo');
-            if (paceInfoDiv && currentViewMode === 'pace') {
-                const monthProgress = getMonthProgress();
-                paceInfoDiv.innerHTML = `
-                    📅 Day ${monthProgress.dayOfMonth} of ${monthProgress.totalDays}
-                    (${(monthProgress.percentElapsed * 100).toFixed(0)}% of month elapsed)
-                `;
-                paceInfoDiv.classList.remove('hidden');
-            }
 
             // Check if we're coming back from OAuth callback
             if (window.location.hash) {
@@ -2136,6 +2127,61 @@
                         const aggregateValues = grandTotal.aggregates;
 
                         if (aggregateValues && aggregateValues.length > 0) {
+                            if (config.aggregationType === 'formula') {
+                                // For percentage fields, find the value that looks like a percentage (0-100 or 0-1)
+                                console.log('All aggregate values:', aggregateValues.map(a => a.value));
+                                for (let i = 0; i < aggregateValues.length; i++) {
+                                    const val = parseFloat(aggregateValues[i]?.value);
+                                    // Check if it's a percentage (0-100) or decimal (0-1)
+                                    if (val >= 0 && val <= 100 && val !== Math.floor(val) || (val > 0 && val < 1)) {
+                                        console.log(`Found percentage value at index ${i}:`, val);
+                                        return val <= 1 ? val * 100 : val;
+                                    }
+                                }
+                                // Fallback: use second-to-last if available (often the formula column)
+                                const idx = aggregateValues.length >= 2 ? aggregateValues.length - 2 : 0;
+                                const value = aggregateValues[idx]?.value;
+                                console.log(`Fallback to index ${idx}:`, value);
+                                return parseFloat(value) || 0;
+                            }
+
+                            if (config.aggregationType === 'formula_currency') {
+                                // For currency formula fields, find by matching key in reportMetadata.aggregates
+                                console.log('All aggregate values (currency):', aggregateValues.map(a => a.value));
+                                const aggInfo = reportData.reportExtendedMetadata?.aggregateColumnInfo;
+                                const aggOrder = reportData.reportMetadata?.aggregates || [];
+                                console.log('Aggregate order from metadata:', aggOrder);
+
+                                if (aggInfo && config.aggregationField) {
+                                    // Find the key that matches our field
+                                    const keys = Object.keys(aggInfo);
+                                    let targetKey = null;
+                                    for (const key of keys) {
+                                        const info = aggInfo[key];
+                                        if (info.label && info.label.toLowerCase().includes(config.aggregationField.toLowerCase())) {
+                                            targetKey = key;
+                                            console.log(`Found matching key: ${key} for "${config.aggregationField}"`);
+                                            break;
+                                        }
+                                    }
+
+                                    if (targetKey) {
+                                        // Find position of this key in the aggregates order
+                                        const idx = aggOrder.indexOf(targetKey);
+                                        if (idx !== -1) {
+                                            const value = aggregateValues[idx]?.value;
+                                            console.log(`Found currency field at ordered index ${idx}:`, value);
+                                            return parseFloat(value) || 0;
+                                        }
+                                    }
+                                }
+                                // Fallback: use last aggregate (rightmost column)
+                                const lastIdx = aggregateValues.length - 1;
+                                const value = aggregateValues[lastIdx]?.value;
+                                console.log(`Currency fallback to last index ${lastIdx}:`, value);
+                                return parseFloat(value) || 0;
+                            }
+
                             if (config.aggregationType === 'sum' || config.aggregationType === 'average') {
                                 const value = aggregateValues[0].value;
                                 return parseFloat(value) || 0;
@@ -2197,17 +2243,61 @@
 
                                             if (monthFact.aggregates && monthFact.aggregates.length > 0) {
                                                 let value;
+                                                const lastIndex = monthFact.aggregates.length - 1;
 
                                                 if (config.aggregationType === 'count') {
                                                     // Record count is typically the last aggregate
-                                                    value = monthFact.aggregates[monthFact.aggregates.length - 1].value;
+                                                    value = monthFact.aggregates[lastIndex].value;
                                                     console.log('Using last aggregate (record count):', value);
+                                                    return parseInt(value) || 0;
+                                                } else if (config.aggregationType === 'formula') {
+                                                    // For percentage fields, find the value that looks like a percentage
+                                                    console.log('All aggregate values:', monthFact.aggregates.map(a => a.value));
+                                                    for (let i = 0; i < monthFact.aggregates.length; i++) {
+                                                        const val = parseFloat(monthFact.aggregates[i]?.value);
+                                                        if (val >= 0 && val <= 100 && val !== Math.floor(val) || (val > 0 && val < 1)) {
+                                                            console.log(`Found percentage value at index ${i}:`, val);
+                                                            return val <= 1 ? val * 100 : val;
+                                                        }
+                                                    }
+                                                    // Fallback
+                                                    const idx = monthFact.aggregates.length >= 2 ? monthFact.aggregates.length - 2 : 0;
+                                                    value = monthFact.aggregates[idx]?.value;
+                                                    console.log(`Fallback to index ${idx}:`, value);
+                                                    return parseFloat(value) || 0;
+                                                } else if (config.aggregationType === 'formula_currency') {
+                                                    // For currency formula fields, find by matching key in reportMetadata.aggregates
+                                                    console.log('All aggregate values (currency):', monthFact.aggregates.map(a => a.value));
+                                                    const aggInfo = reportData.reportExtendedMetadata?.aggregateColumnInfo;
+                                                    const aggOrder = reportData.reportMetadata?.aggregates || [];
+
+                                                    if (aggInfo && config.aggregationField) {
+                                                        const keys = Object.keys(aggInfo);
+                                                        let targetKey = null;
+                                                        for (const key of keys) {
+                                                            const info = aggInfo[key];
+                                                            if (info.label && info.label.toLowerCase().includes(config.aggregationField.toLowerCase())) {
+                                                                targetKey = key;
+                                                                break;
+                                                            }
+                                                        }
+                                                        if (targetKey) {
+                                                            const idx = aggOrder.indexOf(targetKey);
+                                                            if (idx !== -1) {
+                                                                value = monthFact.aggregates[idx]?.value;
+                                                                console.log(`Found currency field at ordered index ${idx}:`, value);
+                                                                return parseFloat(value) || 0;
+                                                            }
+                                                        }
+                                                    }
+                                                    value = monthFact.aggregates[lastIndex]?.value;
+                                                    console.log(`Currency fallback to last index:`, value);
+                                                    return parseFloat(value) || 0;
                                                 } else {
                                                     value = monthFact.aggregates[0].value;
                                                     console.log('Using first aggregate:', value);
+                                                    return parseFloat(value) || parseInt(value) || 0;
                                                 }
-
-                                                return parseInt(value) || parseFloat(value) || 0;
                                             }
                                         } else {
                                             console.log('factMap[' + dateFactKey + '] not found');
@@ -2228,16 +2318,62 @@
 
                                     if (ownerFact.aggregates && ownerFact.aggregates.length > 0) {
                                         let value;
+                                        const lastIndex = ownerFact.aggregates.length - 1;
 
                                         if (config.aggregationType === 'count') {
-                                            value = ownerFact.aggregates[ownerFact.aggregates.length - 1].value;
+                                            value = ownerFact.aggregates[lastIndex].value;
                                             console.log('Using last aggregate (record count):', value);
+                                            return parseInt(value) || 0;
+                                        } else if (config.aggregationType === 'formula') {
+                                            // For percentage fields, find the value that looks like a percentage
+                                            console.log('All aggregate values:', ownerFact.aggregates.map(a => a.value));
+                                            for (let i = 0; i < ownerFact.aggregates.length; i++) {
+                                                const val = parseFloat(ownerFact.aggregates[i]?.value);
+                                                if (val >= 0 && val <= 100 && val !== Math.floor(val) || (val > 0 && val < 1)) {
+                                                    console.log(`Found percentage value at index ${i}:`, val);
+                                                    return val <= 1 ? val * 100 : val;
+                                                }
+                                            }
+                                            // Fallback
+                                            const idx = ownerFact.aggregates.length >= 2 ? ownerFact.aggregates.length - 2 : 0;
+                                            value = ownerFact.aggregates[idx]?.value;
+                                            console.log(`Fallback to index ${idx}:`, value);
+                                            return parseFloat(value) || 0;
+                                        } else if (config.aggregationType === 'formula_currency') {
+                                            // For currency formula fields, find by matching key in reportMetadata.aggregates
+                                            console.log('All aggregate values (currency):', ownerFact.aggregates.map(a => a.value));
+                                            const aggInfo = reportData.reportExtendedMetadata?.aggregateColumnInfo;
+                                            const aggOrder = reportData.reportMetadata?.aggregates || [];
+                                            console.log('Aggregate order from metadata:', aggOrder);
+
+                                            if (aggInfo && config.aggregationField) {
+                                                const keys = Object.keys(aggInfo);
+                                                let targetKey = null;
+                                                for (const key of keys) {
+                                                    const info = aggInfo[key];
+                                                    if (info.label && info.label.toLowerCase().includes(config.aggregationField.toLowerCase())) {
+                                                        targetKey = key;
+                                                        console.log(`Found matching key: ${key} for "${config.aggregationField}"`);
+                                                        break;
+                                                    }
+                                                }
+                                                if (targetKey) {
+                                                    const idx = aggOrder.indexOf(targetKey);
+                                                    if (idx !== -1) {
+                                                        value = ownerFact.aggregates[idx]?.value;
+                                                        console.log(`Found currency field at ordered index ${idx}:`, value);
+                                                        return parseFloat(value) || 0;
+                                                    }
+                                                }
+                                            }
+                                            value = ownerFact.aggregates[lastIndex]?.value;
+                                            console.log(`Currency fallback to last index:`, value);
+                                            return parseFloat(value) || 0;
                                         } else {
                                             value = ownerFact.aggregates[0].value;
                                             console.log('Using first aggregate:', value);
+                                            return parseFloat(value) || parseInt(value) || 0;
                                         }
-
-                                        return parseInt(value) || parseFloat(value) || 0;
                                     }
                                 }
                             }
@@ -2693,8 +2829,6 @@
             let reportLink;
             if (config.type === 'report') {
                 reportLink = `<a href="https://rho.lightning.force.com/${config.reportId}" target="_blank" style="font-size: 14px; color: #00EBC0; text-decoration: none; display: block; margin-top: 4px;">View Report</a>`;
-            } else if (config.metricId === 'winRate') {
-                reportLink = `<div style="font-size: 14px; color: #999; margin-top: 4px;">Calculated Metric (Activations/New Leads)</div>`;
             } else {
                 reportLink = `<div style="font-size: 14px; color: #999; margin-top: 4px;">Calculated Metric</div>`;
             }

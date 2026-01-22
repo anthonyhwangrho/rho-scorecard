@@ -539,6 +539,45 @@
             border-color: #00EBC0;
         }
 
+        .input-with-unit {
+            display: flex;
+            align-items: center;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .input-with-unit:focus-within {
+            border-color: #00EBC0;
+        }
+
+        .input-with-unit input {
+            border: none;
+            border-radius: 0;
+            flex: 1;
+        }
+
+        .input-with-unit input:focus {
+            border: none;
+            outline: none;
+        }
+
+        .input-unit {
+            padding: 12px;
+            background: #f5f5f5;
+            color: #555;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .input-unit-prefix {
+            border-right: 1px solid #e0e0e0;
+        }
+
+        .input-unit-suffix {
+            border-left: 1px solid #e0e0e0;
+        }
+
         a {
             color: #00EBC0;
             text-decoration: none;
@@ -1024,7 +1063,7 @@
                 type: 'report',
                 metricId: 'newLeads',
                 reportId: '00OTP000008LLJO2A4',
-                metricName: 'New Leads Created Per Month',
+                metricName: 'New Leads Created - This Month',
                 target: 29,
                 unit: '',
                 aggregationField: 'ID',
@@ -1034,7 +1073,7 @@
                 type: 'report',
                 metricId: 'applications',
                 reportId: '00OTP000008Vesb2AC',
-                metricName: 'Applications Submitted Per Month',
+                metricName: 'Applications Submitted - This Month',
                 target: 17,
                 unit: '',
                 aggregationField: 'ID',
@@ -1044,7 +1083,7 @@
                 type: 'report',
                 metricId: 'activations',
                 reportId: '00OTP000008Vfwk2AC',
-                metricName: 'Activations Per Month',
+                metricName: 'Activations - This Month',
                 target: 13,
                 unit: '',
                 aggregationField: 'ID',
@@ -1054,17 +1093,29 @@
                 type: 'report',
                 metricId: 'sqlActivatedPercent',
                 reportId: '00OTP000002j7iX2AQ',
-                metricName: 'SQL - Activated %',
-                target: 100,
+                metricName: 'SQL To Activated % - Last Six Months',
+                target: 45,
                 unit: '%',
                 aggregationField: 'Conversion %',
-                aggregationType: 'formula'
+                aggregationType: 'formula',
+                includeDetails: false
+            },
+            {
+                type: 'report',
+                metricId: 'checkingPercentDeposits',
+                reportId: '00OTP000008ugj72AA',
+                metricName: 'Checking % of Total Deposits - Activated Last Six Months',
+                target: 30,
+                unit: '%',
+                aggregationField: 'Checking %',
+                aggregationType: 'formula',
+                includeDetails: false
             },
             {
                 type: 'report',
                 metricId: 'avgTotalBalanceVCICP',
                 reportId: '00OTP000008orXZ2AY',
-                metricName: 'Avg. Total Balance VC ICP - This Month',
+                metricName: 'Avg. Total Balance (VC ICP) - Activated Last Six Months',
                 target: 750000,
                 unit: '$',
                 aggregationField: 'Avg. Total Balance',
@@ -1716,17 +1767,39 @@
                 reportMetrics.forEach(config => {
                     const inputGroup = document.createElement('div');
                     inputGroup.className = 'target-input-group';
-                    inputGroup.innerHTML = `
-                        <label for="target_${config.metricId}">${config.metricName}</label>
-                        <input
-                            type="number"
-                            id="target_${config.metricId}"
-                            value="${config.target}"
-                            min="0"
-                            step="${config.unit === '%' ? '0.1' : '1'}"
-                            placeholder="Enter target"
-                        />
-                    `;
+                    const unitPrefix = config.unit === '$' ? '$' : '';
+                    const unitSuffix = config.unit === '%' ? '%' : '';
+                    const hasUnit = unitPrefix || unitSuffix;
+
+                    if (hasUnit) {
+                        inputGroup.innerHTML = `
+                            <label for="target_${config.metricId}">${config.metricName}</label>
+                            <div class="input-with-unit">
+                                ${unitPrefix ? `<span class="input-unit input-unit-prefix">${unitPrefix}</span>` : ''}
+                                <input
+                                    type="number"
+                                    id="target_${config.metricId}"
+                                    value="${config.target}"
+                                    min="0"
+                                    step="${config.unit === '%' ? '0.1' : '1'}"
+                                    placeholder="Enter target"
+                                />
+                                ${unitSuffix ? `<span class="input-unit input-unit-suffix">${unitSuffix}</span>` : ''}
+                            </div>
+                        `;
+                    } else {
+                        inputGroup.innerHTML = `
+                            <label for="target_${config.metricId}">${config.metricName}</label>
+                            <input
+                                type="number"
+                                id="target_${config.metricId}"
+                                value="${config.target}"
+                                min="0"
+                                step="1"
+                                placeholder="Enter target"
+                            />
+                        `;
+                    }
                     inputsContainer.appendChild(inputGroup);
                 });
             }
@@ -1741,17 +1814,39 @@
                 calculatedMetrics.forEach(config => {
                     const inputGroup = document.createElement('div');
                     inputGroup.className = 'target-input-group';
-                    inputGroup.innerHTML = `
-                        <label for="target_${config.metricId}">${config.metricName}</label>
-                        <input
-                            type="number"
-                            id="target_${config.metricId}"
-                            value="${config.target}"
-                            min="0"
-                            step="${config.unit === '%' ? '0.1' : '1'}"
-                            placeholder="Enter target"
-                        />
-                    `;
+                    const unitPrefix = config.unit === '$' ? '$' : '';
+                    const unitSuffix = config.unit === '%' ? '%' : '';
+                    const hasUnit = unitPrefix || unitSuffix;
+
+                    if (hasUnit) {
+                        inputGroup.innerHTML = `
+                            <label for="target_${config.metricId}">${config.metricName}</label>
+                            <div class="input-with-unit">
+                                ${unitPrefix ? `<span class="input-unit input-unit-prefix">${unitPrefix}</span>` : ''}
+                                <input
+                                    type="number"
+                                    id="target_${config.metricId}"
+                                    value="${config.target}"
+                                    min="0"
+                                    step="${config.unit === '%' ? '0.1' : '1'}"
+                                    placeholder="Enter target"
+                                />
+                                ${unitSuffix ? `<span class="input-unit input-unit-suffix">${unitSuffix}</span>` : ''}
+                            </div>
+                        `;
+                    } else {
+                        inputGroup.innerHTML = `
+                            <label for="target_${config.metricId}">${config.metricName}</label>
+                            <input
+                                type="number"
+                                id="target_${config.metricId}"
+                                value="${config.target}"
+                                min="0"
+                                step="1"
+                                placeholder="Enter target"
+                            />
+                        `;
+                    }
                     inputsContainer.appendChild(inputGroup);
                 });
             }
@@ -1850,15 +1945,15 @@
             }
         }
 
-        async function fetchReportData(reportId, ownerId = null) {
+        async function fetchReportData(reportId, ownerId = null, includeDetails = true) {
             const accessToken = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
             const instanceUrl = localStorage.getItem(STORAGE_KEYS.INSTANCE_URL);
 
-            // Always fetch with details to get row-level data
-            let url = `${instanceUrl}/services/data/v59.0/analytics/reports/${reportId}?includeDetails=true`;
+            let url = `${instanceUrl}/services/data/v59.0/analytics/reports/${reportId}?includeDetails=${includeDetails}`;
 
             console.log('Fetching report:', reportId);
             console.log('Owner filter:', ownerId || 'None');
+            console.log('Include details:', includeDetails);
 
             const response = await fetch(url, {
                 method: 'GET',
@@ -2871,9 +2966,6 @@
                             <div class="metric-name">${config.metricName}</div>
                             ${reportLink}
                         </div>
-                        <div class="metric-status status-${status}">
-                            ${statusLabel}
-                        </div>
                     </div>
 
                     <div class="gauge-container">
@@ -2913,9 +3005,6 @@
                         <div>
                             <div class="metric-name">Aggregate Score</div>
                             <div style="font-size: 16px; color: #999; margin-top: 4px;">Combined Performance Across All Metrics</div>
-                        </div>
-                        <div class="metric-status status-${status}">
-                            ${statusLabel}
                         </div>
                     </div>
 
@@ -2975,7 +3064,8 @@
                 const reportMetrics = await Promise.all(
                     reportConfigs.map(async (config) => {
                         try {
-                            const reportData = await fetchReportData(config.reportId, selectedOwnerId);
+                            const includeDetails = config.includeDetails !== false; // default true
+                            const reportData = await fetchReportData(config.reportId, selectedOwnerId, includeDetails);
                             const actualValue = extractMetricValue(reportData, config, selectedOwnerId);
                             return { config, actualValue };
                         } catch (error) {

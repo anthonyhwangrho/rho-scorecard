@@ -2632,6 +2632,9 @@
                     metricScore = metric.config.target > 0 ? metric.actual / metric.config.target : 0;
                 }
 
+                // Cap individual metric contribution at 1.5
+                metricScore = Math.min(metricScore, 1.5);
+
                 totalScore += metricScore;
             });
 
@@ -3005,6 +3008,7 @@
                         <div>
                             <div class="metric-name">Aggregate Score</div>
                             <div style="font-size: 16px; color: #999; margin-top: 4px;">Combined Performance Across All Metrics</div>
+                            <div style="font-size: 16px; color: #999; margin-top: 4px; font-style: italic;">Note: Each metric capped at 1.5 points max</div>
                         </div>
                     </div>
 

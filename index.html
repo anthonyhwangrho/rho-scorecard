@@ -2548,7 +2548,7 @@
 
             // Calculate total days in quarter and days elapsed
             const totalDays = Math.ceil((quarterEnd - quarterStart) / (1000 * 60 * 60 * 24)) + 1;
-            const daysElapsed = Math.ceil((now - quarterStart) / (1000 * 60 * 60 * 24)) + 1;
+            const daysElapsed = Math.floor((now - quarterStart) / (1000 * 60 * 60 * 24)) + 1;
 
             // Calculate percent elapsed
             const percentElapsed = Math.min(daysElapsed / totalDays, 1);
@@ -2997,7 +2997,7 @@
             const gaugeHTML = createCircularGauge(percentage, status);
 
             // Format score display
-            const scoreDisplay = `${score.toFixed(2)} / ${totalMetrics}`;
+            const scoreDisplay = `${score.toFixed(1)} / ${totalMetrics}`;
 
             return `
                 <div class="metric-card aggregate">

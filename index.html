@@ -832,6 +832,95 @@
             color: #666;
         }
 
+        /* Stack Rank Styles */
+        .stack-rank-card {
+            background: #FFFFFF;
+            border: 1px solid #E5E7EB;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px -1px rgba(10, 10, 10, 0.08);
+        }
+
+        .stack-rank-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .stack-rank-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: #0A0A0A;
+        }
+
+        .stack-rank-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 16px;
+        }
+
+        .stack-rank-table th,
+        .stack-rank-table td {
+            padding: 14px 16px;
+            text-align: left;
+        }
+
+        .stack-rank-table th {
+            background: #F8F9FA;
+            border-bottom: 2px solid #E5E7EB;
+            font-weight: 600;
+            color: #555;
+        }
+
+        .stack-rank-table td {
+            border-bottom: 1px solid #E5E7EB;
+        }
+
+        .stack-rank-table tr:hover {
+            background: #F8F9FA;
+        }
+
+        .stack-rank-table .rank-cell {
+            font-weight: 700;
+            color: #0A0A0A;
+            width: 60px;
+        }
+
+        .stack-rank-table .rank-1 { color: #FFD700; }
+        .stack-rank-table .rank-2 { color: #C0C0C0; }
+        .stack-rank-table .rank-3 { color: #CD7F32; }
+
+        .stack-rank-table .rep-name {
+            font-weight: 500;
+            color: #0A0A0A;
+        }
+
+        .stack-rank-table .score-cell {
+            text-align: right;
+            font-weight: 600;
+        }
+
+        .stack-rank-table .score-success { color: #10B981; }
+        .stack-rank-table .score-warning { color: #F59E0B; }
+        .stack-rank-table .score-danger { color: #EF4444; }
+
+        .stack-rank-loading {
+            text-align: center;
+            padding: 60px;
+            color: #666;
+            font-size: 16px;
+        }
+
+        .stack-rank-btn {
+            background: #1A1A1A;
+        }
+
+        .stack-rank-btn:hover {
+            background: #333;
+        }
+
         @media (max-width: 768px) {
             .scorecard {
                 grid-template-columns: 1fr;
@@ -960,6 +1049,7 @@
                     <h2>Performance Metrics</h2>
                     <div class="button-group">
                         <button class="refresh-btn" onclick="loadScorecard()">Refresh</button>
+                        <button class="stack-rank-btn" onclick="showStackRank()">Leaderboard</button>
                         <button class="config-btn" onclick="showEditTargets()">Edit Targets</button>
                     </div>
                 </div>
@@ -1024,6 +1114,20 @@
 
                 <div style="margin-top: 30px;">
                     <button class="refresh-btn" onclick="saveAcceleratorSettingsAndReturn()" style="padding: 14px 32px; font-size: 16px;">Save Settings</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stack Rank Section -->
+        <div id="stackRankSection" class="hidden">
+            <div class="stack-rank-card">
+                <div class="stack-rank-header">
+                    <h1 class="stack-rank-title">Sales Rep Leaderboard</h1>
+                    <button class="config-btn" onclick="showScorecard()">Back to Scorecard</button>
+                </div>
+                <p class="subtitle" style="margin-bottom: 24px;">All sales reps ranked by aggregate score achievement</p>
+                <div id="stackRankContent">
+                    <div class="stack-rank-loading">Loading stack rank data...</div>
                 </div>
             </div>
         </div>
@@ -1856,9 +1960,171 @@
             // Hide edit sections
             document.getElementById('editTargetsSection').classList.add('hidden');
             document.getElementById('editAcceleratorSection').classList.add('hidden');
+            document.getElementById('stackRankSection').classList.add('hidden');
 
             // Show scorecard section
             document.getElementById('scorecardSection').classList.remove('hidden');
+        }
+
+        function showStackRank() {
+            // Hide other sections
+            document.getElementById('scorecardSection').classList.add('hidden');
+            document.getElementById('editTargetsSection').classList.add('hidden');
+            document.getElementById('editAcceleratorSection').classList.add('hidden');
+
+            // Show stack rank section
+            document.getElementById('stackRankSection').classList.remove('hidden');
+
+            // Load the data
+            loadStackRank();
+        }
+
+        async function loadStackRank() {
+            const content = document.getElementById('stackRankContent');
+            content.innerHTML = '<div class="stack-rank-loading">Loading leaderboard data...</div>';
+
+            try {
+                // Get all configs with current targets
+                const allConfigs = getMetricConfigs();
+                const reportConfigs = allConfigs.filter(c => c.type === 'report');
+                const calculatedConfigs = allConfigs.filter(c => c.type === 'calculated');
+
+                // OPTIMIZED: Fetch each report ONCE and extract all owners' data
+                // This reduces API calls from (owners × reports) to just (reports)
+                console.log('Fetching reports once for all owners...');
+
+                // Map to store: ownerName -> { metricId -> value }
+                const ownerMetricsMap = {};
+
+                // Fetch all reports in parallel (just 7 calls instead of 70+)
+                const reportDataArray = await Promise.all(
+                    reportConfigs.map(async (config) => {
+                        try {
+                            const includeDetails = config.includeDetails !== false;
+                            const reportData = await fetchReportData(config.reportId, null, includeDetails);
+                            return { config, reportData, error: null };
+                        } catch (error) {
+                            console.error(`Error loading report ${config.reportId}:`, error);
+                            return { config, reportData: null, error: error.message };
+                        }
+                    })
+                );
+
+                // Extract all owners from the first successful report's groupings
+                let allOwnerNames = [];
+                for (const { reportData } of reportDataArray) {
+                    if (reportData && reportData.groupingsDown && reportData.groupingsDown.groupings) {
+                        allOwnerNames = reportData.groupingsDown.groupings.map(g => g.label);
+                        break;
+                    }
+                }
+
+                console.log('Found owners:', allOwnerNames);
+
+                // For each report, extract values for all owners
+                for (const { config, reportData, error } of reportDataArray) {
+                    if (error || !reportData) continue;
+
+                    // Extract value for each owner from this report's groupings
+                    for (const ownerName of allOwnerNames) {
+                        const ownerKey = ownerName.trim().toLowerCase();
+
+                        if (!ownerMetricsMap[ownerKey]) {
+                            ownerMetricsMap[ownerKey] = { name: ownerName, metrics: {} };
+                        }
+
+                        try {
+                            const value = extractMetricValue(reportData, config, ownerName);
+                            ownerMetricsMap[ownerKey].metrics[config.metricId] = value;
+                        } catch (e) {
+                            console.error(`Error extracting ${config.metricId} for ${ownerName}:`, e);
+                            ownerMetricsMap[ownerKey].metrics[config.metricId] = 0;
+                        }
+                    }
+                }
+
+                // Now calculate aggregate scores for each owner
+                const ownerScores = Object.values(ownerMetricsMap).map(ownerData => {
+                    const ownerKey = ownerData.name.trim().toLowerCase();
+                    const metricValues = { ...ownerData.metrics };
+
+                    // Calculate derived metrics
+                    const calculatedValues = calculateDerivedMetrics(metricValues, calculatedConfigs);
+                    Object.assign(metricValues, calculatedValues);
+
+                    // Collect metrics data for aggregate calculation
+                    const metricsForAggregate = [];
+                    allConfigs.forEach(config => {
+                        const value = metricValues[config.metricId];
+                        const hasError = typeof value === 'object' && value?.error;
+                        const actualValue = hasError ? 0 : (value || 0);
+
+                        const status = calculateStatus(actualValue, config.target);
+                        metricsForAggregate.push({
+                            config: config,
+                            actual: actualValue,
+                            status: status
+                        });
+                    });
+
+                    // Calculate aggregate score
+                    const aggregateData = calculateAggregateScore(metricsForAggregate, currentViewMode);
+
+                    // Achievement is the aggregate score as a percentage (score/totalMetrics * 100)
+                    return {
+                        name: ownerData.name,
+                        score: aggregateData.score,
+                        totalMetrics: aggregateData.totalMetrics,
+                        achievement: aggregateData.percentage,
+                        status: aggregateData.status
+                    };
+                });
+
+                // Sort by achievement descending
+                ownerScores.sort((a, b) => b.achievement - a.achievement);
+
+                // Helper to get status class based on achievement percentage
+                const getAchievementStatus = (pct) => {
+                    if (pct >= 90) return 'score-success';
+                    if (pct >= 70) return 'score-warning';
+                    return 'score-danger';
+                };
+
+                // Render the table
+                content.innerHTML = `
+                    <table class="stack-rank-table">
+                        <thead>
+                            <tr>
+                                <th>Rank</th>
+                                <th>Sales Rep</th>
+                                <th style="text-align: right;">Score</th>
+                                <th style="text-align: right;">Achievement</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${ownerScores.map((owner, index) => {
+                                const rank = index + 1;
+                                const rankClass = rank <= 3 ? `rank-${rank}` : '';
+                                const scoreClass = owner.status === 'success' ? 'score-success' :
+                                                   owner.status === 'warning' ? 'score-warning' : 'score-danger';
+                                const achievementClass = getAchievementStatus(owner.achievement);
+                                return `
+                                    <tr>
+                                        <td class="rank-cell ${rankClass}">#${rank}</td>
+                                        <td class="rep-name">${owner.name}${owner.error ? ' (error)' : ''}</td>
+                                        <td class="score-cell ${scoreClass}">${owner.score.toFixed(1)}/${owner.totalMetrics}</td>
+                                        <td class="score-cell ${achievementClass}">${owner.achievement.toFixed(0)}%</td>
+                                    </tr>
+                                `;
+                            }).join('')}
+                        </tbody>
+                    </table>
+                `;
+
+            } catch (error) {
+                console.error('Error loading stack rank:', error);
+                content.innerHTML = `<div class="stack-rank-loading" style="color: #dc2626;">Error loading stack rank: ${error.message}</div>`;
+            }
         }
 
         function saveTargets() {

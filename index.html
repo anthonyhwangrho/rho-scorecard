@@ -693,10 +693,9 @@
 
         .view-toggle-group {
             display: flex;
-            gap: 10px;
-            background: #F8F9FA;
-            padding: 4px;
-            border-radius: 8px;
+            background: #E5E7EB;
+            padding: 3px;
+            border-radius: 20px;
             width: fit-content;
         }
 
@@ -704,23 +703,25 @@
             background: transparent;
             color: #666;
             border: none;
-            padding: 10px 20px;
-            border-radius: 6px;
-            font-size: 14px;
+            padding: 7px 18px;
+            border-radius: 17px;
+            font-size: 13px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s;
             margin: 0;
+            white-space: nowrap;
         }
 
         .view-toggle-btn:hover {
-            background: #E5E7EB;
+            color: #333;
             transform: none;
         }
 
         .view-toggle-btn.active {
             background: #00EBC0;
             color: white;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
         }
 
         .pace-info {
@@ -897,6 +898,26 @@
             color: #0A0A0A;
         }
 
+        .stack-rank-table .rep-name a {
+            color: inherit;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .stack-rank-table .rep-name a:hover {
+            color: #00EBC0;
+        }
+
+        .stack-rank-table .rep-name a::after {
+            content: ' →';
+            font-size: 12px;
+            color: #999;
+        }
+
+        .stack-rank-table .rep-name a:hover::after {
+            color: #00EBC0;
+        }
+
         .stack-rank-table .score-cell {
             text-align: right;
             font-weight: 600;
@@ -1047,12 +1068,19 @@
 
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
                     <h2>Performance Metrics</h2>
-                    <div class="button-group">
-                        <button class="refresh-btn" onclick="loadScorecard()">Refresh</button>
-                        <button class="stack-rank-btn" onclick="showStackRank()">Leaderboard</button>
-                        <button class="config-btn" onclick="showEditTargets()">Edit Targets</button>
+                    <div style="display: flex; align-items: center; gap: 16px;">
+                        <div class="view-toggle-group">
+                            <button id="actualViewBtn" class="view-toggle-btn active" onclick="setViewMode('actual')">Actual</button>
+                            <button id="extrapolatedViewBtn" class="view-toggle-btn" onclick="setViewMode('extrapolated')">Extrapolated</button>
+                        </div>
+                        <div class="button-group">
+                            <button class="refresh-btn" onclick="loadScorecard()">Refresh</button>
+                            <button class="stack-rank-btn" onclick="showStackRank()">Leaderboard</button>
+                            <button class="config-btn" onclick="showEditTargets()">Edit Targets</button>
+                        </div>
                     </div>
                 </div>
+                <div id="paceInfo" class="hidden" style="background: #F0FDF4; border: 1px solid #BBF7D0; border-radius: 8px; padding: 10px 16px; margin-bottom: 16px; font-size: 14px; color: #166534;"></div>
                 <div id="scorecard" class="scorecard"></div>
             </div>
         </div>
@@ -1171,7 +1199,8 @@
                 target: 29,
                 unit: '',
                 aggregationField: 'ID',
-                aggregationType: 'count'
+                aggregationType: 'count',
+                extrapolatable: true
             },
             {
                 type: 'report',
@@ -1181,7 +1210,8 @@
                 target: 17,
                 unit: '',
                 aggregationField: 'ID',
-                aggregationType: 'count'
+                aggregationType: 'count',
+                extrapolatable: true
             },
             {
                 type: 'report',
@@ -1191,7 +1221,8 @@
                 target: 13,
                 unit: '',
                 aggregationField: 'ID',
-                aggregationType: 'count'
+                aggregationType: 'count',
+                extrapolatable: true
             },
             {
                 type: 'report',
@@ -1458,27 +1489,27 @@
             LOGIN_URL: 'http://rho.lightning.force.com/'
         };
 
-        // View mode state (default to period pace adjusted)
-        let currentViewMode = 'standard';  // 'standard' or 'pace'
+        // View mode state
+        let currentViewMode = 'actual';  // 'actual' or 'extrapolated'
 
         /**
          * Sets the active view mode and refreshes the scorecard
-         * @param {string} mode - 'standard' or 'pace'
+         * @param {string} mode - 'actual' or 'extrapolated'
          */
         function setViewMode(mode) {
             currentViewMode = mode;
 
             // Update button states
-            document.getElementById('standardViewBtn').classList.toggle('active', mode === 'standard');
-            document.getElementById('paceViewBtn').classList.toggle('active', mode === 'pace');
+            document.getElementById('actualViewBtn').classList.toggle('active', mode === 'actual');
+            document.getElementById('extrapolatedViewBtn').classList.toggle('active', mode === 'extrapolated');
 
-            // Show/hide pace info
+            // Show/hide extrapolation info
             const paceInfoDiv = document.getElementById('paceInfo');
-            if (mode === 'pace') {
+            if (mode === 'extrapolated') {
                 const monthProgress = getMonthProgress();
                 paceInfoDiv.innerHTML = `
                     📅 Day ${monthProgress.dayOfMonth} of ${monthProgress.totalDays}
-                    (${(monthProgress.percentElapsed * 100).toFixed(0)}% of month elapsed)
+                    (${(monthProgress.percentElapsed * 100).toFixed(0)}% elapsed) — Projecting end-of-month values for monthly metrics
                 `;
                 paceInfoDiv.classList.remove('hidden');
             } else {
@@ -1979,6 +2010,13 @@
             loadStackRank();
         }
 
+        function navigateToRep(repName) {
+            const ownerSelect = document.getElementById('ownerSelect');
+            ownerSelect.value = repName;
+            showScorecard();
+            loadScorecard();
+        }
+
         async function loadStackRank() {
             const content = document.getElementById('stackRankContent');
             content.innerHTML = '<div class="stack-rank-loading">Loading leaderboard data...</div>';
@@ -2111,7 +2149,7 @@
                                 return `
                                     <tr>
                                         <td class="rank-cell ${rankClass}">#${rank}</td>
-                                        <td class="rep-name">${owner.name}${owner.error ? ' (error)' : ''}</td>
+                                        <td class="rep-name"><a href="#" onclick="navigateToRep('${owner.name.replace(/'/g, "\\'")}'); return false;">${owner.name}</a>${owner.error ? ' (error)' : ''}</td>
                                         <td class="score-cell ${scoreClass}">${owner.score.toFixed(1)}/${owner.totalMetrics}</td>
                                         <td class="score-cell ${achievementClass}">${owner.achievement.toFixed(0)}%</td>
                                     </tr>
@@ -2830,39 +2868,6 @@
         }
 
         /**
-         * Calculates pace-adjusted target based on days elapsed
-         * @param {number} monthlyTarget - Full monthly target
-         * @param {number} percentElapsed - Fraction of month elapsed (0-1)
-         * @returns {number} Expected achievement by this point in month
-         */
-        function getPaceAdjustedTarget(monthlyTarget, percentElapsed) {
-            return monthlyTarget * percentElapsed;
-        }
-
-        /**
-         * Calculates if metric is on pace
-         * @param {number} actual - Current actual value
-         * @param {number} monthlyTarget - Full monthly target
-         * @param {number} percentElapsed - Fraction of month elapsed (0-1)
-         * @returns {string} 'success', 'warning', or 'danger'
-         */
-        function calculatePaceStatus(actual, monthlyTarget, percentElapsed) {
-            const expectedByNow = getPaceAdjustedTarget(monthlyTarget, percentElapsed);
-
-            // Handle edge case: if we're at the very start of the month
-            if (expectedByNow === 0) {
-                return 'success';  // Can't be behind if target is 0
-            }
-
-            const pacePercentage = actual / expectedByNow;
-
-            // Using same thresholds as standard view (90%/70%)
-            if (pacePercentage >= thresholds.success) return 'success';
-            if (pacePercentage >= thresholds.warning) return 'warning';
-            return 'danger';
-        }
-
-        /**
          * Projects end-of-month achievement based on current pace
          * @param {number} actual - Current actual value
          * @param {number} dayOfMonth - Current day of month
@@ -2878,7 +2883,7 @@
         /**
          * Calculates aggregate performance score across all metrics
          * @param {Array} metricsData - Array of {config, actual, status}
-         * @param {string} viewMode - 'standard' or 'pace'
+         * @param {string} viewMode - 'actual' or 'extrapolated'
          * @returns {Object} {score, totalMetrics, percentage, status}
          */
         function calculateAggregateScore(metricsData, viewMode) {
@@ -2888,15 +2893,15 @@
 
             metricsData.forEach(metric => {
                 let metricScore = 0;
+                let valueToUse = metric.actual;
 
-                if (viewMode === 'pace') {
-                    // Pace-adjusted: actual ÷ expected-by-now
-                    const expected = getPaceAdjustedTarget(metric.config.target, monthProgress.percentElapsed);
-                    metricScore = expected > 0 ? metric.actual / expected : 0;
-                } else {
-                    // Standard: actual ÷ target
-                    metricScore = metric.config.target > 0 ? metric.actual / metric.config.target : 0;
+                if (viewMode === 'extrapolated' && metric.config.extrapolatable) {
+                    // Extrapolated: use projected end-of-month value for monthly metrics
+                    valueToUse = getProjectedFinish(metric.actual, monthProgress.dayOfMonth, monthProgress.totalDays);
                 }
+
+                // Always compare against full target
+                metricScore = metric.config.target > 0 ? valueToUse / metric.config.target : 0;
 
                 // Cap individual metric contribution at 1.5
                 metricScore = Math.min(metricScore, 1.5);
@@ -2934,13 +2939,19 @@
             let processedMetrics = metricsData;
             const monthProgress = getMonthProgress();
 
-            if (currentViewMode === 'pace') {
-                processedMetrics = metricsData.map(metric => ({
-                    ...metric,
-                    status: calculatePaceStatus(metric.actual, metric.config.target, monthProgress.percentElapsed),
-                    paceTarget: getPaceAdjustedTarget(metric.config.target, monthProgress.percentElapsed),
-                    projected: getProjectedFinish(metric.actual, monthProgress.dayOfMonth, monthProgress.totalDays)
-                }));
+            if (currentViewMode === 'extrapolated') {
+                processedMetrics = metricsData.map(metric => {
+                    if (metric.config.extrapolatable) {
+                        const projected = getProjectedFinish(metric.actual, monthProgress.dayOfMonth, monthProgress.totalDays);
+                        const projectedPct = metric.config.target > 0 ? (projected / metric.config.target) * 100 : 100;
+                        return {
+                            ...metric,
+                            projected,
+                            status: projectedPct >= 90 ? 'success' : projectedPct >= 70 ? 'warning' : 'danger'
+                        };
+                    }
+                    return metric;
+                });
             }
 
             // Count metrics by status
@@ -2952,7 +2963,7 @@
 
             const totalMetrics = processedMetrics.length;
             const ownerText = ownerName ? ownerName : 'the team';
-            const viewText = currentViewMode === 'pace' ? 'on pace for' : 'on track for';
+            const viewText = currentViewMode === 'extrapolated' ? 'projected to hit' : 'on track for';
 
             // Generate summary (adjust language for pace mode)
             let summaryText = '';
@@ -2961,7 +2972,7 @@
             } else if (statusCounts.success >= totalMetrics * 0.75) {
                 summaryText = `<span class="recommendation-icon">→</span><span class="recommendation-text">Strong performance overall. ${ownerText} is ${viewText} ${statusCounts.success} out of ${totalMetrics} metrics.</span>`;
             } else if (statusCounts.danger >= totalMetrics * 0.5) {
-                const pacePhrase = currentViewMode === 'pace' ? 'behind pace on' : 'behind target on';
+                const pacePhrase = currentViewMode === 'extrapolated' ? 'projected to miss' : 'behind target on';
                 summaryText = `<span class="recommendation-icon">→</span><span class="recommendation-text">Performance needs attention. ${ownerText} is ${pacePhrase} ${statusCounts.danger} out of ${totalMetrics} metrics.</span>`;
             } else {
                 summaryText = `<span class="recommendation-icon">→</span><span class="recommendation-text">Mixed performance. ${ownerText} is ${viewText} ${statusCounts.success} metrics, at risk for ${statusCounts.warning}, and behind on ${statusCounts.danger}.</span>`;
@@ -2969,18 +2980,17 @@
 
             summaryDiv.innerHTML = summaryText;
 
-            // Generate recommendations (adjust for pace mode)
+            // Generate recommendations
             const recommendations = [];
 
             processedMetrics.forEach(metric => {
-                if (currentViewMode === 'pace') {
-                    // PACE MODE RECOMMENDATIONS
-                    const percentage = metric.paceTarget > 0 ? (metric.actual / metric.paceTarget) * 100 : 100;
-                    const dailyPaceNeeded = metric.config.target / monthProgress.totalDays;
-                    const gap = metric.paceTarget - metric.actual;
+                if (currentViewMode === 'extrapolated' && metric.config.extrapolatable && metric.projected !== undefined) {
+                    // EXTRAPOLATED MODE RECOMMENDATIONS for monthly metrics
+                    const gap = metric.config.target - metric.projected;
 
                     if (metric.status === 'danger') {
                         if (metric.actual === 0) {
+                            const dailyPaceNeeded = metric.config.target / monthProgress.totalDays;
                             recommendations.push({
                                 priority: 1,
                                 text: `<strong>Urgent:</strong> ${metric.config.metricName} is at 0. Need to average ${formatNumber(dailyPaceNeeded, metric.config.unit)}/day to hit monthly target.`
@@ -2988,22 +2998,22 @@
                         } else {
                             recommendations.push({
                                 priority: 1,
-                                text: `<strong>Behind Pace:</strong> ${metric.config.metricName} needs ${formatNumber(gap, metric.config.unit)} more to be on pace. Projected finish: ${formatNumber(metric.projected, metric.config.unit)}.`
+                                text: `<strong>Projected Miss:</strong> ${metric.config.metricName} is projected to finish at ${formatNumber(metric.projected, metric.config.unit)}, short of target by ${formatNumber(gap, metric.config.unit)}.`
                             });
                         }
                     } else if (metric.status === 'warning') {
                         recommendations.push({
                             priority: 2,
-                            text: `<strong>Slipping:</strong> ${metric.config.metricName} pace is slowing. Need ${formatNumber(gap, metric.config.unit)} more to stay on track.`
+                            text: `<strong>At Risk:</strong> ${metric.config.metricName} is projected at ${formatNumber(metric.projected, metric.config.unit)}, slightly below target of ${formatNumber(metric.config.target, metric.config.unit)}.`
                         });
                     } else if (metric.projected > metric.config.target * 1.1) {
                         recommendations.push({
                             priority: 3,
-                            text: `<strong>Ahead of pace:</strong> ${metric.config.metricName} is projected to finish at ${formatNumber(metric.projected, metric.config.unit)} - exceeding target!`
+                            text: `<strong>Strong pace:</strong> ${metric.config.metricName} is projected to finish at ${formatNumber(metric.projected, metric.config.unit)} — exceeding target!`
                         });
                     }
                 } else {
-                    // STANDARD MODE RECOMMENDATIONS (existing logic)
+                    // ACTUAL MODE RECOMMENDATIONS (or non-extrapolatable metrics)
                     const percentage = (metric.actual / metric.config.target) * 100;
 
                     if (metric.status === 'danger') {
@@ -3169,18 +3179,17 @@
             let percentage, status, displayTarget, statusLabel;
             const monthProgress = getMonthProgress();
 
-            if (currentViewMode === 'pace') {
-                // PACE-ADJUSTED VIEW
-                const paceTarget = getPaceAdjustedTarget(config.target, monthProgress.percentElapsed);
+            if (currentViewMode === 'extrapolated' && config.extrapolatable) {
+                // EXTRAPOLATED VIEW for monthly metrics
                 const projected = getProjectedFinish(actual, monthProgress.dayOfMonth, monthProgress.totalDays);
 
-                percentage = paceTarget > 0 ? (actual / paceTarget) * 100 : 100;
-                status = calculatePaceStatus(actual, config.target, monthProgress.percentElapsed);
-                displayTarget = paceTarget;
-                statusLabel = status === 'success' ? '✓ On Pace' : status === 'warning' ? '⚠ Below Pace' : '✗ Off Pace';
+                percentage = config.target > 0 ? (projected / config.target) * 100 : 100;
+                status = percentage >= 90 ? 'success' : percentage >= 70 ? 'warning' : 'danger';
+                displayTarget = config.target;
+                statusLabel = status === 'success' ? '✓ On Pace' : status === 'warning' ? '⚠ At Risk' : '✗ Off Pace';
 
             } else {
-                // STANDARD VIEW
+                // ACTUAL VIEW (or non-extrapolatable metrics in extrapolated mode)
                 percentage = (actual / config.target) * 100;
                 status = calculateStatus(actual, config.target);
                 displayTarget = config.target;
@@ -3199,7 +3208,7 @@
 
             // Build metric values HTML based on view mode
             let valuesHTML;
-            if (currentViewMode === 'pace') {
+            if (currentViewMode === 'extrapolated' && config.extrapolatable) {
                 const projected = getProjectedFinish(actual, monthProgress.dayOfMonth, monthProgress.totalDays);
                 valuesHTML = `
                     <div class="value-item">
@@ -3207,12 +3216,12 @@
                         <div class="value-number">${formatNumber(actual, config.unit)}</div>
                     </div>
                     <div class="value-item">
-                        <div class="value-label">Expected</div>
-                        <div class="value-number">${formatNumber(displayTarget, config.unit)}</div>
-                    </div>
-                    <div class="value-item">
                         <div class="value-label">Projected</div>
                         <div class="value-number">${formatNumber(projected, config.unit)}</div>
+                    </div>
+                    <div class="value-item">
+                        <div class="value-label">Target</div>
+                        <div class="value-number">${formatNumber(displayTarget, config.unit)}</div>
                     </div>
                 `;
             } else {
@@ -3251,15 +3260,15 @@
         /**
          * Creates the aggregate performance score card HTML
          * @param {Object} aggregateData - {score, totalMetrics, percentage, status}
-         * @param {string} viewMode - 'standard' or 'pace'
+         * @param {string} viewMode - 'actual' or 'extrapolated'
          * @returns {string} HTML markup for aggregate card
          */
         function createAggregateCard(aggregateData, viewMode) {
             const { score, totalMetrics, percentage, status } = aggregateData;
 
             // Determine status label based on view mode
-            const statusLabel = viewMode === 'pace'
-                ? (status === 'success' ? '✓ On Pace' : status === 'warning' ? '⚠ Below Pace' : '✗ Off Pace')
+            const statusLabel = viewMode === 'extrapolated'
+                ? (status === 'success' ? '✓ On Pace' : status === 'warning' ? '⚠ At Risk' : '✗ Off Pace')
                 : (status === 'success' ? '✓ On Track' : status === 'warning' ? '⚠ At Risk' : '✗ Behind');
 
             // Create gauge
